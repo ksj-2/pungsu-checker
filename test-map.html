@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>카카오맵 API 테스트</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            padding: 20px;
+            text-align: center;
+            background: #f5f5f5;
+        }
+        
+        h1 {
+            color: #333;
+        }
+        
+        #map {
+            width: 80%;
+            max-width: 800px;
+            height: 400px;
+            margin: 20px auto;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+        }
+        
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 20px auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .success {
+            color: #28a745;
+        }
+        
+        .error {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <h1>🗺️ 카카오맵 API 테스트</h1>
+    <p>지도가 보이면 API가 정상 작동하는 것입니다!</p>
+    
+    <div id="map"></div>
+    
+    <button onclick="testAddress()">📍 주소 → 좌표 변환 테스트</button>
+    <button onclick="testElevation()">⛰️ 고도 데이터 테스트</button>
+    
+    <div id="result"></div>
+
+    <!-- 여기에 JavaScript 키 넣기! -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=f90959efbc49398f80378e190c64ab18&libraries=services"></script>
+    
+    <script>
+        // 지도 표시
+        try {
+            const container = document.getElementById('map');
+            const options = {
+                center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울시청
+                level: 3
+            };
+            const map = new kakao.maps.Map(container, options);
+            console.log('✅ 지도 로딩 성공!');
+            
+            // 마커 추가
+            const marker = new kakao.maps.Marker({
+                position: new kakao.maps.LatLng(37.5665, 126.9780)
+            });
+            marker.setMap(map);
+            
+        } catch(e) {
+            console.error('❌ 지도 로딩 실패:', e);
+            document.getElementById('result').innerHTML = `
+                <h2 class="error">❌ 에러 발생</h2>
+                <p>JavaScript 키를 확인하세요!</p>
+                <p>${e.message}</p>
+            `;
+        }
+        
+        // 주소로 좌표 찾기 테스트
+        function testAddress() {
+            const geocoder = new kakao.maps.services.Geocoder();
+            
+            geocoder.addressSearch('서울시 강남구 테헤란로 123', function(result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                    
+                    document.getElementById('result').innerHTML = `
+                        <h2 class="success">✅ 주소 변환 성공!</h2>
+                        <p><strong>입력 주소:</strong> 서울시 강남구 테헤란로 123</p>
+                        <p><strong>위도 (latitude):</strong> ${result[0].y}</p>
+                        <p><strong>경도 (longitude):</strong> ${result[0].x}</p>
+                        <p class="success" style="margin-top: 20px;">
+                            🎉 카카오맵 API가 정상 작동합니다!
+                        </p>
+                    `;
+                    
+                    // 지도 이동
+                    const map = new kakao.maps.Map(document.getElementById('map'), {
+                        center: coords,
+                        level: 3
+                    });
+                    
+                    const marker = new kakao.maps.Marker({
+                        map: map,
+                        position: coords
+                    });
+                    
+                    console.log('✅ 주소 변환 성공:', result[0]);
+                } else {
+                    document.getElementById('result').innerHTML = `
+                        <h2 class="error">❌ 에러 발생</h2>
+                        <p>상태: ${status}</p>
+                    `;
+                    console.error('❌ 주소 변환 실패:', status);
+                }
+            });
+        }
+        
+        // 고도 데이터 테스트 (Google Elevation API는 나중에)
+        function testElevation() {
+            document.getElementById('result').innerHTML = `
+                <h2>⛰️ 고도 데이터 테스트</h2>
+                <p>고도 API는 다음 단계에서 구현할 예정입니다!</p>
+                <p>지금은 카카오맵 주소 변환만 테스트합니다.</p>
+            `;
+        }
+    </script>
+</body>
+</html>
