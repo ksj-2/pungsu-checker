@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -206,8 +207,8 @@
                         <label class="block text-xs sm:text-sm font-semibold mb-2 text-slate-300">
                             집의 위치
                         </label>
-                        <div id="alley-options" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <!-- JS will populate this with icons -->
+                        <div id="alley-options" class="space-y-3">
+                            <!-- JS will populate this with illustrations -->
                         </div>
                     </div>
 
@@ -443,7 +444,7 @@
             buildingTypeSelect: document.getElementById('building-type-select'),
         };
 
-        // --- FORM OPTIONS (with ICONS) ---
+        // --- FORM OPTIONS (with ILLUSTRATIONS) ---
         const FORM_OPTIONS = {
             directions: [
                 { value: '남향', label: '남향 (낮 12-2시에 해가 정면)' },
@@ -459,11 +460,11 @@
                 { value: '3시간이상', label: '3시간 이상 (이상적!)' }
             ],
             alleyOptions: [
-                { value: '큰길가', label: '큰 길가', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><rect x="10" y="14" width="4" height="6"/></svg>` },
-                { value: '골목중간', label: '골목 중간', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><rect x="3" y="14" width="4" height="6"/><rect x="10" y="14" width="4" height="6"/><rect x="17" y="14" width="4" height="6"/></svg>` },
-                { value: '교차로모퉁이', label: 'T자/교차로 모퉁이', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18V6"/><path d="M18 12H6"/><rect x="14" y="14" width="6" height="6"/></svg>`},
-                { value: '큰길T자', label: 'T자형 도로 끝 (정면)', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18V9"/><path d="M18 9H6"/><rect x="10" y="3" width="4" height="6"/></svg>` },
-                { value: '막다른끝', label: '막다른 골목 끝', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13"/><path d="M17 12l-4 4"/><path d="M17 12l-4-4"/><rect x="3" y="3" width="4" height="6"/></svg>` },
+                { value: '큰길가', label: '큰 길가', illustration: `<svg viewBox="0 0 100 60" class="w-full h-full"><path d="M0 50 H 100" stroke-width="12" stroke="#475569" stroke-linecap="round"></path><rect x="40" y="20" width="20" height="20" fill="#10b981"></rect><path d="M40 20 L 50 10 L 60 20 Z" fill="#10b981"></path></svg>` },
+                { value: '골목중간', label: '골목 중간', illustration: `<svg viewBox="0 0 100 60" class="w-full h-full"><path d="M45 0 V 60" stroke-width="10" stroke="#475569" stroke-linecap="round"></path><rect x="15" y="20" width="20" height="20" fill="#94a3b8"></rect><path d="M15 20 L 25 10 L 35 20 Z" fill="#94a3b8"></path><rect x="65" y="20" width="20" height="20" fill="#10b981"></rect><path d="M65 20 L 75 10 L 85 20 Z" fill="#10b981"></path></svg>` },
+                { value: '교차로모퉁이', label: 'T자/교차로 모퉁이', illustration: `<svg viewBox="0 0 100 60" class="w-full h-full"><path d="M0 25 H 100" stroke-width="10" stroke="#475569" stroke-linecap="round"></path><path d="M45 25 V 60" stroke-width="10" stroke="#475569" stroke-linecap="round"></path><rect x="65" y="35" width="20" height="20" fill="#f59e0b"></rect><path d="M65 35 L 75 25 L 85 35 Z" fill="#f59e0b"></path></svg>`},
+                { value: '큰길T자', label: 'T자형 도로 끝 (정면)', illustration: `<svg viewBox="0 0 100 60" class="w-full h-full"><path d="M0 25 H 100" stroke-width="10" stroke="#475569" stroke-linecap="round"></path><path d="M45 25 V 60" stroke-width="10" stroke="#475569" stroke-linecap="round"></path><rect x="40" y="0" width="20" height="15" fill="#ef4444"></rect></svg>` },
+                { value: '막다른끝', label: '막다른 골목 끝', illustration: `<svg viewBox="0 0 100 60" class="w-full h-full"><path d="M45 60 V 20" stroke-width="10" stroke="#475569" stroke-linecap="round"></path><path d="M20 20 H 80" stroke-width="10" stroke="#475569" stroke-linecap="round"></path><rect x="40" y="0" width="20" height="15" fill="#f59e0b"></rect><rect x="10" y="25" width="20" height="20" fill="#94a3b8"></rect><path d="M10 25 l10 -10 l10 10" fill="#94a3b8"></path><rect x="70" y="25" width="20" height="20" fill="#94a3b8"></rect><path d="M70 25 l10 -10 l10 10" fill="#94a3b8"></path></svg>` },
             ],
             terrainOptions: ['평지', '비탈', '골짜기', '언덕'],
             balconyExpandedOptions: [
@@ -500,14 +501,14 @@
                 </label>
             `).join('');
             
-            // Alley Position (with icons)
+            // Alley Position (with illustrations)
             const alleyContainer = document.getElementById('alley-options');
             alleyContainer.innerHTML = FORM_OPTIONS.alleyOptions.map(opt => `
-                <label class="flex items-center p-3 sm:p-3.5 rounded-md border cursor-pointer transition-colors active:scale-98 bg-slate-900 border-slate-600 hover:border-slate-500">
-                    <input type="radio" name="alleyPosition" value="${opt.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
-                    <div class="flex items-center ml-2.5">
-                        ${opt.icon}
-                        <span class="text-xs sm:text-sm text-slate-200">${opt.label}</span>
+                <label class="flex flex-col p-3 rounded-md border cursor-pointer transition-colors bg-slate-900 border-slate-600 hover:border-slate-500">
+                    <div class="w-full h-20 rounded bg-slate-800/60 p-1 border border-slate-700">${opt.illustration}</div>
+                    <div class="flex items-center mt-3">
+                        <input type="radio" name="alleyPosition" value="${opt.value}" onchange="updateFormState()" class="w-5 h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
+                        <span class="ml-3 text-sm font-medium text-slate-200">${opt.label}</span>
                     </div>
                 </label>
             `).join('');
