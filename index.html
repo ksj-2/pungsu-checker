@@ -1,33 +1,959 @@
-// api/proxy.js
 
-export default async function handler(request, response) {
-  // 1. 웹사이트에서 보낸 '주소' 정보를 꺼냅니다.
-  const { address } = request.query;
-  
-  if (!address) {
-    return response.status(400).json({ error: '주소를 입력해주세요.' });
-  }
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우리집 풍수 체커</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom scrollbar for better aesthetics in dark mode */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b; /* slate-800 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155; /* slate-700 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; /* slate-600 */
+        }
+        /* Style for radio button checkmark */
+        input[type="radio"] {
+          box-shadow: none;
+        }
+    </style>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-200">
 
-  // 2. Vercel에 숨겨둔 나의 비밀 카카오 API 키를 가져옵니다.
-  const KAKAO_API_KEY = process.env.KAKAO_API_KEY;
+    <!-- App Root -->
+    <div id="app">
+        <!-- 헤더 -->
+        <header class="w-full max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8 text-center">
+            <div class="flex justify-center items-center gap-2 sm:gap-4 mb-2">
+                <i data-lucide="mountain" class="w-8 h-8 sm:w-12 sm:h-12 text-emerald-400"></i>
+                <h1 class="text-2xl sm:text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
+                    우리집 풍수 체커
+                </h1>
+                <i data-lucide="waves" class="w-8 h-8 sm:w-12 sm:h-12 text-cyan-400"></i>
+            </div>
+            <p class="text-sm sm:text-lg text-slate-400">
+                150년 전통 풍수 이론 + 카카오맵 실제 데이터
+            </p>
+        </header>
 
-  // 3. 이 키를 가지고 진짜 카카오 서버에 데이터를 요청합니다.
-  const kakaoResponse = await fetch(
-    `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(address)}`,
-    {
-      headers: {
-        Authorization: `KakaoAK ${KAKAO_API_KEY}`,
-      },
-    }
-  );
+        <main class="w-full max-w-5xl mx-auto px-3 sm:px-4 pb-16">
+            <!-- 방향 가이드 모달 (Initially hidden) -->
+            <div id="direction-guide-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-3 sm:p-4">
+                <div class="bg-slate-800 rounded-lg max-w-2xl w-full max-h-[85vh] sm:max-h-[90vh] overflow-y-auto border border-slate-700">
+                    <div class="sticky top-0 bg-slate-800 p-3 sm:p-4 border-b border-slate-700 flex justify-between items-center">
+                        <h3 class="text-lg sm:text-xl font-bold text-emerald-400 flex items-center gap-2">
+                            <i data-lucide="compass" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                            <span class="text-base sm:text-xl">거실 방향 확인하는 법</span>
+                        </h3>
+                        <button onclick="toggleDirectionGuide(false)" class="text-slate-400 hover:text-white p-2">
+                            <i data-lucide="x" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                        <div class="bg-blue-900/20 p-3 sm:p-4 rounded-lg border border-blue-400/30">
+                            <h4 class="font-semibold text-blue-300 mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
+                                📱 방법 1: 스마트폰 나침반 (가장 정확!)
+                            </h4>
+                            <ol class="text-xs sm:text-sm text-slate-300 space-y-1.5 sm:space-y-2 list-decimal list-inside">
+                                <li>거실 창문 앞에 서세요</li>
+                                <li>스마트폰 "나침반" 앱을 실행하세요
+                                    <p class="ml-4 sm:ml-6 text-xs text-slate-400 mt-1">
+                                    • 아이폰: 기본 탑재<br/>
+                                    • 안드로이드: 플레이스토어에서 "나침반" 검색
+                                    </p>
+                                </li>
+                                <li>창문 밖을 향해 폰을 들어보세요</li>
+                                <li>표시된 방향을 확인하세요 (N=북, E=동, S=남, W=서)</li>
+                            </ol>
+                        </div>
+                        <div class="bg-yellow-900/20 p-3 sm:p-4 rounded-lg border border-yellow-400/30">
+                            <h4 class="font-semibold text-yellow-300 mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
+                                ☀️ 방법 2: 햇빛으로 판단
+                            </h4>
+                            <div class="text-xs sm:text-sm text-slate-300 space-y-1.5 sm:space-y-2">
+                                <p>낮 12시~2시에 거실에서:</p>
+                                <ul class="space-y-1 ml-3 sm:ml-4">
+                                    <li>☀️ 창문으로 해가 정면에 보임 → <strong class="text-yellow-300">남향</strong></li>
+                                    <li>☀️ 왼쪽에서 햇빛이 들어옴 → <strong class="text-yellow-300">동향</strong></li>
+                                    <li>☀️ 오른쪽에서 햇빛이 들어옴 → <strong class="text-yellow-300">서향</strong></li>
+                                    <li>🌙 햇빛이 거의 안 들어옴 → <strong class="text-yellow-300">북향</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="bg-slate-700/50 p-3 sm:p-4 rounded-lg border border-slate-600">
+                            <h4 class="font-semibold text-slate-300 mb-2 sm:mb-3 text-sm sm:text-base">
+                                💡 참고: 남향이 왜 좋을까요?
+                            </h4>
+                            <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                                한국은 북반구에 위치해 있어, 남쪽에서 햇빛이 가장 많이 들어옵니다. 
+                                남향 집은 겨울에도 따뜻하고, 여름에는 해가 높이 떠서 덜 덥습니다. 
+                                풍수에서는 햇빛 = 양의 기운 = 생명력으로 봅니다.
+                            </p>
+                        </div>
+                        <button
+                            onclick="toggleDirectionGuide(false)"
+                            class="w-full py-3 sm:py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-md transition-colors text-sm sm:text-base"
+                        >
+                            확인했어요
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-  const data = await kakaoResponse.json();
-  
-  // 4. 카카오에서 받은 결과를 웹사이트에 다시 전달해줍니다.
-  // CORS 헤더 추가: 다른 도메인(GitHub Pages)에서 내 Vercel 서버로 요청할 수 있게 허용해주는 설정
-  response.setHeader('Access-Control-Allow-Origin', '*');
-  response.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
-  return response.status(200).json(data);
-}
+            <!-- 입력 폼 섹션 -->
+            <section id="form-section">
+                <form id="main-form" class="bg-slate-800/50 p-4 sm:p-6 rounded-lg shadow-lg border border-slate-700 space-y-4 sm:space-y-5">
+                    <!-- 주소 -->
+                    <div>
+                        <label class="block text-xs sm:text-sm font-semibold mb-2 text-slate-300">주소</label>
+                        <div class="relative">
+                            <i data-lucide="map-pin" class="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 sm:w-5 sm:h-5"></i>
+                            <input
+                                id="address-input"
+                                type="text"
+                                placeholder="예) 서울특별시 종로구 세종대로 209"
+                                class="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-3.5 bg-slate-900 border border-slate-600 rounded-md focus:ring-2 focus:ring-emerald-400 focus:outline-none text-sm sm:text-base"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- 층수 & 건물 유형 -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold mb-2 text-slate-300">층수</label>
+                            <input
+                                id="floor-input"
+                                type="number"
+                                placeholder="예) 7층"
+                                min="1"
+                                max="100"
+                                class="w-full px-3 sm:px-4 py-3 sm:py-3.5 bg-slate-900 border border-slate-600 rounded-md focus:ring-2 focus:ring-emerald-400 focus:outline-none text-sm sm:text-base"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold mb-2 text-slate-300">건물 유형</label>
+                            <select id="building-type-select" class="w-full px-3 sm:px-4 py-3 sm:py-3.5 bg-slate-900 border border-slate-600 rounded-md focus:ring-2 focus:ring-emerald-400 focus:outline-none text-sm sm:text-base">
+                                <option value="">선택하세요</option>
+                                <option value="아파트">아파트</option>
+                                <option value="오피스텔">오피스텔</option>
+                                <option value="빌라/다세대">빌라/다세대</option>
+                                <option value="단독주택">단독주택</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 방향 선택 -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-xs sm:text-sm font-semibold text-slate-300">거실 방향</label>
+                            <button type="button" onclick="toggleDirectionGuide(true)" class="flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 py-1.5 px-2">
+                                <i data-lucide="help-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                                <span class="hidden sm:inline">방향 확인법</span>
+                                <span class="sm:hidden">확인법</span>
+                            </button>
+                        </div>
+                        <div id="direction-options" class="space-y-2">
+                           <!-- JS will populate this -->
+                        </div>
+                    </div>
+
+                    <!-- 거실 조망 -->
+                    <div>
+                        <label class="block text-xs sm:text-sm font-semibold mb-2 text-slate-300">
+                            거실 창문에서 보이는 것 (다중 선택)
+                        </label>
+                        <p class="text-xs text-slate-400 mb-2 sm:mb-3">가장 큰 창문 기준</p>
+                        <div id="balcony-view-options" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                             <!-- JS will populate this -->
+                        </div>
+                    </div>
+
+                    <!-- 햇빛 시간 -->
+                     <div>
+                        <label class="block text-xs sm:text-sm font-semibold mb-2 text-slate-300">
+                            하루 햇빛 시간
+                        </label>
+                        <div id="sunlight-options" class="space-y-2">
+                             <!-- JS will populate this -->
+                        </div>
+                    </div>
+
+                    <!-- 골목 위치 -->
+                    <div>
+                        <label class="block text-xs sm:text-sm font-semibold mb-2 text-slate-300">
+                            집의 위치
+                        </label>
+                        <div id="alley-options" class="space-y-2">
+                            <!-- JS will populate this -->
+                        </div>
+                    </div>
+
+                    <!-- 지형 특성 -->
+                     <div>
+                        <label class="block text-xs sm:text-sm font-semibold mb-2 text-slate-300">
+                            집터 지형 (다중 선택)
+                        </label>
+                        <div id="terrain-options" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <!-- JS will populate this -->
+                        </div>
+                    </div>
+
+                    <!-- 베란다 확장 -->
+                    <div>
+                        <label class="block text-xs sm:text-sm font-semibold mb-2 text-slate-300">
+                            베란다 확장 여부
+                        </label>
+                        <div id="balcony-expanded-options" class="grid grid-cols-2 gap-2 sm:gap-4">
+                            <!-- JS will populate this -->
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        onclick="handleAnalyze()"
+                        class="w-full py-4 sm:py-4.5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold rounded-md hover:opacity-90 active:scale-98 transition-all text-base sm:text-lg shadow-lg"
+                    >
+                        풍수 감정 시작
+                    </button>
+
+                    <p id="error-message" class="hidden text-red-400 text-center text-sm sm:text-base"></p>
+                </form>
+
+                <div class="mt-6 sm:mt-8 p-4 sm:p-6 bg-slate-800/30 rounded-lg text-center text-xs sm:text-sm text-slate-500 border border-slate-700">
+                    [광고 1] 디스플레이 반응형
+                </div>
+            </section>
+
+            <!-- 로딩 섹션 (Initially hidden) -->
+            <section id="loading-section" class="hidden">
+                <div class="mt-6 sm:mt-8 p-5 sm:p-6 bg-slate-800 rounded-lg border border-slate-700">
+                    <h3 class="text-lg sm:text-xl font-semibold text-center text-emerald-400 mb-5 sm:mb-6">AI 정밀 분석 중</h3>
+                    <div class="flex items-center justify-center gap-3">
+                        <i data-lucide="loader-2" class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 animate-spin"></i>
+                        <span id="loading-step" class="text-slate-300 text-sm sm:text-base"></span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 결과 섹션 (Initially hidden) -->
+            <section id="result-section" class="hidden">
+                <div class="space-y-6 sm:space-y-8">
+                    <!-- 점수 카드 -->
+                    <div class="bg-slate-800 p-5 sm:p-8 rounded-lg border border-slate-700">
+                        <p id="result-address" class="text-center text-slate-400 mb-3 sm:mb-4 text-xs sm:text-sm"></p>
+                        <p id="result-details" class="text-center text-slate-400 mb-4 sm:mb-6 text-xs sm:text-sm"></p>
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10">
+                            <div class="scale-90 sm:scale-100">
+                                <div class="relative w-48 h-48">
+                                    <svg class="w-full h-full" viewBox="0 0 120 120">
+                                      <circle class="text-slate-700" stroke-width="10" stroke="currentColor" fill="transparent" r="52" cx="60" cy="60" />
+                                      <circle
+                                        id="score-gauge-circle"
+                                        class="transform -rotate-90 origin-center transition-all duration-1000"
+                                        style="transition-property: stroke-dashoffset;"
+                                        stroke-width="10"
+                                        stroke-dasharray="326.72"
+                                        stroke-dashoffset="326.72"
+                                        stroke-linecap="round"
+                                        stroke="currentColor"
+                                        fill="transparent"
+                                        r="52"
+                                        cx="60"
+                                        cy="60"
+                                      />
+                                    </svg>
+                                    <div id="score-gauge-text" class="absolute inset-0 flex flex-col items-center justify-center">
+                                      <span class="text-5xl font-bold">0</span>
+                                      <span class="text-lg">점</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center sm:text-left">
+                                <div id="result-emoji" class="text-5xl sm:text-6xl mb-2"></div>
+                                <h2 id="result-grade" class="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400"></h2>
+                                <div id="result-nearby" class="mt-3 sm:mt-4 text-xs sm:text-sm text-slate-400 space-y-1"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 공유하기 섹션 -->
+                    <div class="bg-gradient-to-r from-emerald-900/20 to-cyan-900/20 p-4 sm:p-6 rounded-lg border border-emerald-700/30">
+                        <div class="flex items-center justify-center gap-2 mb-3 sm:mb-4">
+                            <i data-lucide="share-2" class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400"></i>
+                            <h3 class="text-lg sm:text-xl font-semibold text-slate-200">결과 공유하기</h3>
+                        </div>
+                        <p class="text-center text-slate-400 text-xs sm:text-sm mb-4">친구들에게도 풍수 체커를 알려주세요!</p>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                            <button onclick="shareToKakao()" class="flex flex-col items-center gap-2 p-3 sm:p-4 bg-[#FEE500] hover:bg-[#FDD835] text-[#3C1E1E] rounded-lg transition-all active:scale-95">
+                                <i data-lucide="message-circle" class="w-6 h-6 sm:w-7 sm:h-7"></i>
+                                <span class="text-xs sm:text-sm font-semibold">카카오톡</span>
+                            </button>
+                            <button onclick="shareToFacebook()" class="flex flex-col items-center gap-2 p-3 sm:p-4 bg-[#1877F2] hover:bg-[#0C63D4] text-white rounded-lg transition-all active:scale-95">
+                                <i data-lucide="facebook" class="w-6 h-6 sm:w-7 sm:h-7"></i>
+                                <span class="text-xs sm:text-sm font-semibold">페이스북</span>
+                            </button>
+                            <button onclick="shareToTwitter()" class="flex flex-col items-center gap-2 p-3 sm:p-4 bg-[#1DA1F2] hover:bg-[#0C8BD9] text-white rounded-lg transition-all active:scale-95">
+                                <i data-lucide="twitter" class="w-6 h-6 sm:w-7 sm:h-7"></i>
+                                <span class="text-xs sm:text-sm font-semibold">트위터</span>
+                            </button>
+                            <button id="copy-link-btn" onclick="copyLink()" class="flex flex-col items-center gap-2 p-3 sm:p-4 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all active:scale-95">
+                                <div id="copy-link-default">
+                                    <div class="flex flex-col items-center gap-2">
+                                        <i data-lucide="link-2" class="w-6 h-6 sm:w-7 sm:h-7"></i>
+                                        <span class="text-xs sm:text-sm font-semibold">링크복사</span>
+                                    </div>
+                                </div>
+                                <div id="copy-link-success" class="hidden">
+                                    <div class="flex flex-col items-center gap-2 text-emerald-400">
+                                        <i data-lucide="check" class="w-6 h-6 sm:w-7 sm:h-7"></i>
+                                        <span class="text-xs sm:text-sm font-semibold">복사됨!</span>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="p-3 sm:p-4 bg-slate-800/30 rounded-lg text-center text-xs sm:text-sm text-slate-500 border border-slate-700">
+                        [광고 2] 디스플레이 수평 반응형
+                    </div>
+
+                    <!-- 좋은 점 -->
+                    <div id="positive-section" class="hidden">
+                        <h3 class="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-slate-200 flex items-center gap-2">
+                            <i data-lucide="check-circle" class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400"></i>
+                            이 집의 좋은 점
+                        </h3>
+                        <div id="positive-items-container" class="space-y-2.5 sm:space-y-3"></div>
+                    </div>
+
+                    <!-- 나쁜 점 -->
+                    <div id="negative-section" class="hidden">
+                        <h3 class="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-slate-200 flex items-center gap-2">
+                            <i data-lucide="alert-triangle" class="w-5 h-5 sm:w-6 sm:h-6 text-red-400"></i>
+                            주의할 점
+                        </h3>
+                        <div id="negative-items-container" class="space-y-2.5 sm:space-y-3"></div>
+                    </div>
+                    
+                    <div class="p-3 sm:p-4 bg-slate-800/30 rounded-lg text-center text-xs sm:text-sm text-slate-500 border border-slate-700">
+                        [광고 3] 디스플레이 수평 반응형
+                    </div>
+
+                    <!-- 비보책 -->
+                    <div id="solutions-section" class="hidden">
+                        <h3 class="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-slate-200 flex items-center gap-2">
+                            <i data-lucide="shield-alert" class="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400"></i>
+                            기운을 보강하는 비보책
+                        </h3>
+                        <div id="solutions-container" class="space-y-3 sm:space-y-4"></div>
+                    </div>
+
+                    <div class="p-4 sm:p-6 bg-slate-800/30 rounded-lg text-center text-xs sm:text-sm text-slate-500 border border-slate-700">
+                        [광고 4] 멀티플렉스 광고
+                    </div>
+
+                    <div class="text-center">
+                        <button onclick="resetApp()" class="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-slate-600 to-slate-700 text-white font-bold rounded-md hover:opacity-90 active:scale-98 transition-all text-sm sm:text-base">
+                            다른 주소로 새로 분석하기
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="w-full max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8 text-center text-slate-500 text-xs sm:text-sm border-t border-slate-800">
+            <p>© 2025 우리집 풍수 체커. 카카오맵 기반 실제 데이터 분석</p>
+            <p class="mt-1 text-xs">앵커광고, 사이드 레일광고는 애드센스 설정에서 활성화하세요</p>
+            <p class="mt-2 text-xs text-slate-600">
+                💡 카카오톡 공유 기능 사용: KAKAO_JS_KEY를 설정하세요 (
+                <a href="https://developers.kakao.com" target="_blank" rel="noopener noreferrer" class="text-emerald-500 hover:underline">
+                    개발자센터
+                </a>
+                )
+            </p>
+        </footer>
+    </div>
+    
+    <script>
+        // =================================================================
+        // SCRIPT SECTION
+        // This script uses vanilla JavaScript for a static HTML page.
+        // =================================================================
+        
+        // --- KAKAO SHARING SETUP ---
+        const KAKAO_JS_KEY = 'YOUR_KAKAO_JAVASCRIPT_KEY';
+
+        (function() {
+            const script = document.createElement('script');
+            script.src = 'https://developers.kakao.com/sdk/js/kakao.js';
+            script.async = true;
+            script.onload = () => {
+                if (window.Kakao && !window.Kakao.isInitialized() && KAKAO_JS_KEY !== 'YOUR_KAKAO_JAVASCRIPT_KEY') {
+                    try {
+                        window.Kakao.init(KAKAO_JS_KEY);
+                    } catch(e) {
+                        console.error("Kakao SDK initialization failed:", e);
+                    }
+                }
+            };
+            document.head.appendChild(script);
+        })();
+
+
+        // --- STATE MANAGEMENT ---
+        let formData = {
+            address: '', floor: '', direction: '', buildingType: '',
+            balconyView: [], sunlightHours: '', alleyPosition: '',
+            terrain: [], balconyExpanded: ''
+        };
+        let appState = {
+            loading: false,
+            result: null,
+            error: '',
+            loadingStep: '',
+            showDirectionGuide: false
+        };
+
+        // --- DOM ELEMENT REFERENCES ---
+        const DOMElements = {
+            formSection: document.getElementById('form-section'),
+            mainForm: document.getElementById('main-form'),
+            loadingSection: document.getElementById('loading-section'),
+            resultSection: document.getElementById('result-section'),
+            errorMessage: document.getElementById('error-message'),
+            loadingStep: document.getElementById('loading-step'),
+            directionGuideModal: document.getElementById('direction-guide-modal'),
+            addressInput: document.getElementById('address-input'),
+            floorInput: document.getElementById('floor-input'),
+            buildingTypeSelect: document.getElementById('building-type-select'),
+        };
+
+        // --- FORM OPTIONS ---
+        const FORM_OPTIONS = {
+            directions: [
+                { value: '남향', label: '남향 (낮 12-2시에 해가 정면)' },
+                { value: '동향', label: '동향 (아침 7-9시에 해가 정면)' },
+                { value: '서향', label: '서향 (오후 4-6시에 해가 정면)' },
+                { value: '북향', label: '북향 (햇빛 거의 안 들어옴)' },
+                { value: '잘모름', label: '잘 모르겠어요 (방향 점수 제외)' }
+            ],
+            viewOptions: ['산', '강/하천', '공원', '건물', '도로', '아무것도 안보임'],
+            sunlightOptions: [
+                { value: '거의없음', label: '거의 없음 (1시간 미만)' },
+                { value: '1-2시간', label: '1-2시간' },
+                { value: '3시간이상', label: '3시간 이상 (이상적!)' }
+            ],
+            alleyOptions: [
+                { value: '큰길가', label: '큰 길가' },
+                { value: '골목중간', label: '골목 중간' },
+                { value: '막다른끝', label: '막다른 골목 끝' },
+                { value: '큰길T자', label: 'T자형 도로 끝' }
+            ],
+            terrainOptions: ['평지', '비탈', '골짜기', '언덕'],
+            balconyExpandedOptions: [
+                { value: '예' },
+                { value: '아니오' }
+            ]
+        };
+
+        // --- UI RENDERING FUNCTIONS ---
+        function renderFormOptions() {
+            // Direction
+            const directionContainer = document.getElementById('direction-options');
+            directionContainer.innerHTML = FORM_OPTIONS.directions.map(dir => `
+                <label class="flex items-center gap-2.5 sm:gap-3 p-3 sm:p-3.5 rounded-md border cursor-pointer transition-colors active:scale-98 bg-slate-900 border-slate-600 hover:border-slate-500">
+                    <input type="radio" name="direction" value="${dir.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
+                    <span class="text-xs sm:text-sm text-slate-200">${dir.label}</span>
+                </label>
+            `).join('');
+
+            // Balcony View
+            const viewContainer = document.getElementById('balcony-view-options');
+            viewContainer.innerHTML = FORM_OPTIONS.viewOptions.map(view => `
+                <button type="button" onclick="toggleMultiSelect('balconyView', this, '${view}')" class="px-3 sm:px-4 py-2.5 sm:py-3 rounded-md border transition-colors text-xs sm:text-sm active:scale-95 bg-slate-900 border-slate-600 hover:border-emerald-400">
+                    ${view}
+                </button>
+            `).join('');
+
+            // Sunlight
+            const sunlightContainer = document.getElementById('sunlight-options');
+            sunlightContainer.innerHTML = FORM_OPTIONS.sunlightOptions.map(opt => `
+                <label class="flex items-center gap-2.5 sm:gap-3 p-3 sm:p-3.5 rounded-md border cursor-pointer transition-colors active:scale-98 bg-slate-900 border-slate-600 hover:border-slate-500">
+                    <input type="radio" name="sunlightHours" value="${opt.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
+                    <span class="text-xs sm:text-sm text-slate-200">${opt.label}</span>
+                </label>
+            `).join('');
+            
+            // Alley Position
+            const alleyContainer = document.getElementById('alley-options');
+            alleyContainer.innerHTML = FORM_OPTIONS.alleyOptions.map(opt => `
+                <label class="flex items-center gap-2.5 sm:gap-3 p-3 sm:p-3.5 rounded-md border cursor-pointer transition-colors active:scale-98 bg-slate-900 border-slate-600 hover:border-slate-500">
+                    <input type="radio" name="alleyPosition" value="${opt.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
+                    <span class="text-xs sm:text-sm text-slate-200">${opt.label}</span>
+                </label>
+            `).join('');
+            
+            // Terrain
+            const terrainContainer = document.getElementById('terrain-options');
+            terrainContainer.innerHTML = FORM_OPTIONS.terrainOptions.map(terrain => `
+                 <button type="button" onclick="toggleMultiSelect('terrain', this, '${terrain}')" class="px-3 sm:px-4 py-2.5 sm:py-3 rounded-md border transition-colors text-xs sm:text-sm active:scale-95 bg-slate-900 border-slate-600 hover:border-emerald-400">
+                    ${terrain}
+                </button>
+            `).join('');
+            
+            // Balcony Expanded
+            const balconyExpandedContainer = document.getElementById('balcony-expanded-options');
+            balconyExpandedContainer.innerHTML = FORM_OPTIONS.balconyExpandedOptions.map(opt => `
+                <label class="flex items-center justify-center gap-2 p-3 sm:p-3.5 rounded-md border cursor-pointer transition-colors active:scale-95 bg-slate-900 border-slate-600 hover:border-slate-500">
+                    <input type="radio" name="balconyExpanded" value="${opt.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
+                    <span class="text-xs sm:text-sm text-slate-200">${opt.value}</span>
+                </label>
+            `).join('');
+        }
+
+        function renderApp() {
+            // Show/hide main sections
+            DOMElements.formSection.classList.toggle('hidden', appState.loading || appState.result);
+            DOMElements.loadingSection.classList.toggle('hidden', !appState.loading);
+            DOMElements.resultSection.classList.toggle('hidden', !appState.result);
+
+            // Update error message
+            if (appState.error) {
+                DOMElements.errorMessage.textContent = appState.error;
+                DOMElements.errorMessage.classList.remove('hidden');
+            } else {
+                DOMElements.errorMessage.classList.add('hidden');
+            }
+
+            // Update loading step
+            if (appState.loading) {
+                DOMElements.loadingStep.textContent = appState.loadingStep;
+            }
+
+            // Render result data if available
+            if (appState.result) {
+                renderResultData(appState.result);
+            }
+        }
+
+        function renderResultData(result) {
+            document.getElementById('result-address').textContent = result.address;
+            document.getElementById('result-details').textContent = `${result.formData.floor}층 ${result.formData.direction} ${result.formData.buildingType}`;
+            document.getElementById('result-emoji').textContent = result.emoji;
+            document.getElementById('result-grade').textContent = result.grade;
+            
+            const nearbyEl = document.getElementById('result-nearby');
+            nearbyEl.innerHTML = `
+                <p>🏔️ 주변 산: ${result.nearbyData.mountains}개</p>
+                <p>💧 주변 수계: ${result.nearbyData.rivers}개</p>
+                <p>🌳 주변 공원: ${result.nearbyData.parks}개</p>
+            `;
+
+            renderScoreGauge(result.totalScore);
+            renderAnalysisItems('positive', result.positiveItems);
+            renderAnalysisItems('negative', result.negativeItems);
+            renderSolutions(result.solutions);
+        }
+
+        function renderScoreGauge(score) {
+            const circle = document.getElementById('score-gauge-circle');
+            const textContainer = document.getElementById('score-gauge-text');
+            const circumference = 2 * Math.PI * 52; // 326.72...
+            const offset = circumference - (score / 100) * circumference;
+
+            let colorClass = 'text-emerald-400';
+            if (score < 40) colorClass = 'text-red-400';
+            else if (score < 60) colorClass = 'text-yellow-400';
+            else if (score < 80) colorClass = 'text-cyan-400';
+            
+            setTimeout(() => {
+                circle.style.strokeDashoffset = offset;
+                circle.setAttribute('class', `transform -rotate-90 origin-center transition-all duration-1000 ${colorClass}`);
+            }, 100);
+
+            textContainer.setAttribute('class', `absolute inset-0 flex flex-col items-center justify-center ${colorClass}`);
+            textContainer.innerHTML = `<span class="text-5xl font-bold">${score}</span><span class="text-lg">점</span>`;
+        }
+
+        function renderAnalysisItems(type, items) {
+            const containerId = `${type}-items-container`;
+            const sectionId = `${type}-section`;
+            const container = document.getElementById(containerId);
+            const section = document.getElementById(sectionId);
+            
+            if (items.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+            section.classList.remove('hidden');
+
+            const isPositive = type === 'positive';
+            const color = isPositive ? 'emerald' : 'red';
+            const icon = isPositive ? 'arrow-up' : 'arrow-down';
+            
+            container.innerHTML = items.map((item, idx) => `
+                <div class="bg-slate-800/50 p-3 sm:p-4 rounded-lg border border-${color}-900/30">
+                    <button onclick="toggleExpand(this)" class="w-full flex items-start gap-3 sm:gap-4">
+                        <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-${color}-900/50 text-${color}-400">
+                            <i data-lucide="${icon}" class="sm:w-6 sm:h-6" style="width: 18px; height: 18px;"></i>
+                        </div>
+                        <div class="flex-1 text-left">
+                            <h4 class="font-semibold text-slate-100 text-sm sm:text-base">
+                                ${item.title}
+                                <span class="ml-2 text-xs sm:text-sm font-bold text-${color}-400">(${item.score > 0 ? '+' : ''}${item.score}점)</span>
+                            </h4>
+                            <p class="text-slate-400 text-xs sm:text-sm mt-1">${item.description}</p>
+                        </div>
+                        <i data-lucide="chevron-down" class="text-${color}-400 w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 transition-transform"></i>
+                    </button>
+                    <div class="hidden ml-11 sm:ml-14 mt-2 sm:mt-3 p-2.5 sm:p-3 bg-${color}-900/20 rounded-lg">
+                        <p class="text-xs sm:text-sm text-${color}-200/80">${isPositive ? '💡' : '⚠️'} ${item.reason}</p>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderSolutions(solutions) {
+            const container = document.getElementById('solutions-container');
+            const section = document.getElementById('solutions-section');
+            if (solutions.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+            section.classList.remove('hidden');
+
+            container.innerHTML = solutions.map(sol => `
+                <div class="bg-yellow-900/20 p-3 sm:p-4 rounded-lg border border-yellow-400/30">
+                    <div class="flex items-start gap-3 sm:gap-4">
+                        <i data-lucide="lightbulb" class="w-8 h-8 sm:w-10 sm:h-10 text-yellow-400 flex-shrink-0"></i>
+                        <div>
+                            <h4 class="font-semibold text-yellow-300 mb-1.5 sm:mb-2 text-sm sm:text-base">${sol.title}</h4>
+                            <p class="text-yellow-200/80 text-xs sm:text-sm mb-1.5 sm:mb-2">${sol.description}</p>
+                            <p class="text-yellow-200/60 text-xs italic">💡 ${sol.reason}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+
+        // --- EVENT HANDLERS & LOGIC ---
+        
+        function updateFormState() {
+            formData.address = DOMElements.addressInput.value;
+            formData.floor = DOMElements.floorInput.value;
+            formData.buildingType = DOMElements.buildingTypeSelect.value;
+            
+            const selectedDirection = document.querySelector('input[name="direction"]:checked');
+            formData.direction = selectedDirection ? selectedDirection.value : '';
+            
+            const selectedSunlight = document.querySelector('input[name="sunlightHours"]:checked');
+            formData.sunlightHours = selectedSunlight ? selectedSunlight.value : '';
+            
+            const selectedAlley = document.querySelector('input[name="alleyPosition"]:checked');
+            formData.alleyPosition = selectedAlley ? selectedAlley.value : '';
+            
+            const selectedBalcony = document.querySelector('input[name="balconyExpanded"]:checked');
+            formData.balconyExpanded = selectedBalcony ? selectedBalcony.value : '';
+
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                const label = radio.closest('label');
+                if (label) {
+                    if (radio.checked) {
+                        label.classList.add('bg-emerald-900/30', 'border-emerald-500');
+                        label.classList.remove('bg-slate-900', 'border-slate-600', 'hover:border-slate-500');
+                    } else {
+                        label.classList.remove('bg-emerald-900/30', 'border-emerald-500');
+                        label.classList.add('bg-slate-900', 'border-slate-600', 'hover:border-slate-500');
+                    }
+                }
+            });
+        }
+        
+        function toggleMultiSelect(field, element, value) {
+            const index = formData[field].indexOf(value);
+            if (index > -1) {
+                formData[field].splice(index, 1);
+                element.classList.remove('bg-emerald-600', 'border-emerald-500', 'text-white');
+                element.classList.add('bg-slate-900', 'border-slate-600', 'hover:border-emerald-400');
+            } else {
+                formData[field].push(value);
+                element.classList.add('bg-emerald-600', 'border-emerald-500', 'text-white');
+                element.classList.remove('bg-slate-900', 'border-slate-600', 'hover:border-emerald-400');
+            }
+        }
+        
+        function toggleDirectionGuide(show) {
+            appState.showDirectionGuide = show;
+            DOMElements.directionGuideModal.classList.toggle('hidden', !show);
+        }
+
+        function toggleExpand(buttonElement) {
+            const content = buttonElement.nextElementSibling;
+            const icon = buttonElement.querySelector('[data-lucide^="chevron"]');
+            const isHidden = content.classList.contains('hidden');
+
+            content.classList.toggle('hidden');
+            if (isHidden) {
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        async function handleAnalyze() {
+            updateFormState(); 
+            if (!formData.address || !formData.floor || !formData.direction || !formData.buildingType || 
+                !formData.sunlightHours || !formData.alleyPosition || !formData.balconyExpanded) {
+                appState.error = '모든 항목을 입력해주세요.';
+                renderApp();
+                return;
+            }
+            appState.error = '';
+            appState.result = null;
+            appState.loading = true;
+            renderApp();
+
+            try {
+                const report = await realAnalyzeFengShui(formData, (step) => {
+                    appState.loadingStep = step;
+                    renderApp();
+                });
+                appState.result = report;
+            } catch (e) {
+                appState.error = e.message || '분석 중 오류가 발생했습니다.';
+            } finally {
+                appState.loading = false;
+                renderApp();
+            }
+        }
+
+        function resetApp() {
+            appState = {
+                loading: false, result: null, error: '', loadingStep: '',
+                showDirectionGuide: false
+            };
+            formData = {
+                address: '', floor: '', direction: '', buildingType: '',
+                balconyView: [], sunlightHours: '', alleyPosition: '',
+                terrain: [], balconyExpanded: ''
+            };
+            DOMElements.mainForm.reset();
+            
+            document.querySelectorAll('#balcony-view-options button, #terrain-options button').forEach(btn => {
+                btn.classList.remove('bg-emerald-600', 'border-emerald-500', 'text-white');
+                btn.classList.add('bg-slate-900', 'border-slate-600', 'hover:border-emerald-400');
+            });
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                 const label = radio.closest('label');
+                 if(label) {
+                    label.classList.remove('bg-emerald-900/30', 'border-emerald-500');
+                    label.classList.add('bg-slate-900', 'border-slate-600', 'hover:border-slate-500');
+                 }
+            });
+            renderApp();
+        }
+
+        // --- SHARING FUNCTIONS ---
+        function shareToKakao() {
+            const result = appState.result;
+            if (!result) return;
+            if (!window.Kakao || !window.Kakao.isInitialized()) {
+                alert('카카오톡 공유 기능을 사용하려면 카카오 JavaScript 키를 설정하고 앱을 등록해야 합니다.');
+                return;
+            }
+            window.Kakao.Share.sendDefault({
+                objectType: 'feed',
+                content: {
+                    title: '우리집 풍수 체커 결과',
+                    description: `${result.address}의 풍수 점수는 ${result.totalScore}점! ${result.grade} ${result.emoji}`,
+                    imageUrl: 'https://picsum.photos/seed/fengshui/800/400',
+                    link: { mobileWebUrl: window.location.href, webUrl: window.location.href },
+                },
+                buttons: [{
+                    title: '우리집도 체크하기',
+                    link: { mobileWebUrl: window.location.origin, webUrl: window.location.origin },
+                }],
+            });
+        }
+
+        function shareToFacebook() {
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
+        }
+
+        function shareToTwitter() {
+            const result = appState.result;
+            if (!result) return;
+            const text = encodeURIComponent(`우리집 풍수 점수는 ${result.totalScore}점! ${result.grade} ${result.emoji}\n`);
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=400');
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                document.getElementById('copy-link-default').classList.add('hidden');
+                document.getElementById('copy-link-success').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('copy-link-default').classList.remove('hidden');
+                    document.getElementById('copy-link-success').classList.add('hidden');
+                }, 2000);
+            }).catch(() => {
+                alert('링크 복사에 실패했습니다.');
+            });
+        }
+
+        // --- REAL ANALYSIS LOGIC with Vercel Proxy ---
+        async function realAnalyzeFengShui(formData, setLoadingStep) {
+            const sleep = ms => new Promise(r => setTimeout(r, ms));
+            
+            // =========================================================================
+            //  ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+            //  이곳에 Vercel에서 복사한 '심부름꾼' 주소를 붙여넣어 주세요!
+            //  =========================================================================
+            const VERCEL_PROXY_URL = 'https://pungsu-backend.vercel.app';
+            //  ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+            // =========================================================================
+
+            if (VERCEL_PROXY_URL === '여기에_복사한_Vercel_주소를_붙여넣으세요') {
+                throw new Error('Vercel 프록시 주소가 설정되지 않았습니다. index.html 파일을 수정해주세요.');
+            }
+
+            setLoadingStep('주소를 좌표로 변환 중...');
+            let coords;
+            try {
+                const response = await fetch(`${VERCEL_PROXY_URL}/api/proxy?address=${encodeURIComponent(formData.address)}`);
+                if (!response.ok) throw new Error(`서버 응답 오류: ${response.status}`);
+                const data = await response.json();
+
+                if (data.documents && data.documents.length > 0) {
+                    const { x, y } = data.documents[0];
+                    coords = { lat: parseFloat(y), lng: parseFloat(x) };
+                } else {
+                    throw new Error('주소를 찾을 수 없습니다. 좀 더 자세히 입력해보세요.');
+                }
+            } catch (error) {
+                console.error('Error fetching coordinates:', error);
+                throw new Error(`주소 변환 중 오류가 발생했습니다: ${error.message}`);
+            }
+            await sleep(500);
+
+            const searchNearby = async (keyword, radius) => {
+                try {
+                    const response = await fetch(`${VERCEL_PROXY_URL}/api/proxy?keyword=${encodeURIComponent(keyword)}&lat=${coords.lat}&lng=${coords.lng}&radius=${radius}`);
+                    if (!response.ok) return 0;
+                    const data = await response.json();
+                    return data.documents?.length || 0;
+                } catch (e) {
+                    console.error(`Error searching for ${keyword}:`, e);
+                    return 0;
+                }
+            };
+
+            setLoadingStep('주변 지형 분석 중...');
+            const mountains = await searchNearby('산', 1000);
+            const rivers = await searchNearby('강', 1000);
+            await sleep(500);
+            
+            setLoadingStep('주변 환경 분석 중...');
+            const parks = await searchNearby('공원', 500);
+            const towers = await searchNearby('송전탑', 200);
+            const tunnels = await searchNearby('터널', 500);
+            const cemeteries = await searchNearby('묘지', 500);
+            const hospitals = await searchNearby('병원', 300);
+            await sleep(800);
+            
+            setLoadingStep('풍수 점수 계산 중...');
+            let score = 70;
+            const positiveItems = [];
+            const negativeItems = [];
+            const solutions = [];
+
+            const floor = parseInt(formData.floor);
+            const hasBalconyMountain = formData.balconyView.includes('산');
+            const hasBalconyRiver = formData.balconyView.includes('강/하천');
+            const hasBalconyBuilding = formData.balconyView.includes('건물');
+            const hasBalconyRoad = formData.balconyView.includes('도로');
+
+            if (mountains > 0 && rivers > 0 && hasBalconyMountain && hasBalconyRiver) { score += 20; positiveItems.push({ title: '배산임수 (背山臨水) 완벽 구현', description: `뒤로 ${mountains}개의 산이 받쳐주고 앞으로 ${rivers}개의 물이 흐르는 전형적인 명당입니다.`, reason: '등받이 의자에 앉은 것처럼 편안하고 안정적인 기운을 받습니다. 산은 든든한 지원을, 물은 재물운을 가져다줍니다.', score: 20 }); }
+            else if (mountains > 0 && hasBalconyMountain) { score += 10; positiveItems.push({ title: '배산 (背山) - 든든한 뒷배', description: `주변 ${mountains}개의 산이 뒤에서 받쳐주는 형태입니다.`, reason: '산이 바람을 막아주고 안정감을 주며, 귀인의 도움을 받는 운이 있습니다.', score: 10 }); }
+            if (rivers > 0 && hasBalconyRiver) { score += 15; positiveItems.push({ title: '수간재물 (水干財物)', description: `거실에서 ${rivers}개의 수계가 보이며, 물이 재물을 관장합니다.`, reason: '물은 재물을 상징하며, 특히 궁수 형태(물이 집을 감싸는)라면 재물이 쌓입니다.', score: 15 }); }
+            if (parks > 0) { score += 10; positiveItems.push({ title: '명당 (明堂) - 넓은 공간', description: `주변 ${parks}개의 공원이 있어 기운이 모일 넓은 공간이 있습니다.`, reason: '집 앞에 넓고 깨끗한 공간이 있으면 재물운이 상승하고 생기가 넘칩니다.', score: 10 }); }
+            if (floor >= 3 && floor <= 8) { score += 10; positiveItems.push({ title: `지기 강한 ${floor}층`, description: '나무가 자랄 수 있는 높이(20m) 내에 있어 땅의 기운을 충분히 받습니다.', reason: '지기는 3-8층까지 미치며, 이 범위가 건강과 생명력이 가장 왕성합니다. 나무가 자랄 수 있는 높이 = 땅의 기운이 닿는 범위입니다.', score: 10 }); }
+            else if (floor >= 15) { score -= 20; negativeItems.push({ title: `고층 ${floor}층 - 지기 부족`, description: '15층 이상 고층으로 땅의 기운이 미치지 않습니다.', reason: '고층일수록 땅의 자기장이 약해지며, 연구 결과 임신율 감소, 불면증, 어지럼증이 나타납니다. 풍수에서는 "하체가 약해진다"고 표현합니다.', score: -20 }); solutions.push({ title: '고층 지기 보완책', description: '실내에 흙을 많이 담은 큰 화분을 여러 개 두고, 천연석(화강암, 옥석) 소품을 배치하세요.', reason: '식물의 흙과 돌의 철분이 미세하게나ma 지자기를 전달합니다. 침대 밑에 황토볼이나 숯을 두는 것도 전통적인 방법입니다.' }); }
+            if (formData.direction === '남향') { score += 10; positiveItems.push({ title: '정남향', description: '햇빛이 하루 3시간 이상 잘 들어 생기가 넘칩니다.', reason: '특히 낮 12-2시에 햇빛이 정면으로 들어와 양의 기운이 가득합니다. 건강에 가장 좋은 방향입니다.', score: 10 }); }
+            else if (formData.direction === '동향') { score += 5; positiveItems.push({ title: '동향 - 아침 햇살', description: '아침 햇살이 들어와 하루를 활기차게 시작할 수 있습니다.', reason: '아침 햇빛은 하루의 기운을 시작하는 길한 에너지입니다.', score: 5 }); }
+            else if (formData.direction === '서향') { score -= 5; negativeItems.push({ title: '서향 - 오후 햇빛', description: '오후 4-6시에 강한 햇빛이 들어와 여름에 더울 수 있습니다.', reason: '저녁 햇빛은 밤의 시작을 알리는 기운으로, 생기를 빼앗을 수 있습니다.', score: -5 }); }
+            else if (formData.direction === '북향') { score -= 10; negativeItems.push({ title: '북향 - 햇빛 부족', description: '햇빛이 거의 들지 않아 음습할 수 있습니다.', reason: '햇빛이 부족하면 생기가 상실되고 무기력해집니다. 양의 기운이 약합니다.', score: -10 }); }
+            if (towers > 0) { score -= 20; negativeItems.push({ title: '송전탑 인근 (高壓線)', description: `200m 내에 ${towers}개의 송전탑이 있어 강한 전자기장의 영향을 받습니다.`, reason: '땅의 기운을 어지럽히고 건강에 해롭습니다. 집안의 기운이 혼란스러워집니다.', score: -20 }); solutions.push({ title: '송전탑 비보책', description: '창가에 수정(크리스탈)을 놓아 나쁜 기운을 정화하고, 숯을 집안 곳곳에 두어 전자파를 흡수하도록 합니다.', reason: '수정은 전자파를 정화하는 효과가 있으며, 숯은 전자파 차단 능력이 뛰어납니다.' }); }
+            if (tunnels > 0) { score -= 30; negativeItems.push({ title: '터널 근처 (隧道) - 치명적!', description: `500m 내에 ${tunnels}개의 터널이 있습니다. 산의 혈맥을 자르는 가장 치명적인 흉지입니다.`, reason: '터널은 땅의 혈관을 자르는 것으로, 기운이 터지듯 빠져나갑니다. 주변의 기운까지 쓸려 들어갑니다.', score: -30 }); solutions.push({ title: '터널 근처 유일한 방법', description: '베란다에 수조를 두고 물을 담아 나쁜 기운을 차단하세요. 하지만 근본적 해결은 어렵습니다.', reason: '물은 흐르는 기운을 막아주지만, 터널의 영향은 매우 강력합니다. 장기적으로는 이주를 고려하는 것이 좋습니다.' }); }
+            if (hasBalconyBuilding && !hasBalconyMountain) { score -= 15; negativeItems.push({ title: '앞을 가로막는 건물', description: '거실 앞쪽에 건물이 조망을 막고 있습니다.', reason: '"내 인생을 막는 산"이 되어 하는 일이 잘 풀리지 않고 답답함을 느낍니다. 심리적으로도 우울감을 유발합니다.', score: -15 }); solutions.push({ title: '막힌 조망 개선책', description: '거실 창가에 거울을 45도 각도로 배치하여 시야를 확장시키세요.', reason: '거울이 막힌 시야를 확장시키는 착시 효과를 줍니다. 밝은 색상의 커튼과 조명으로 답답함을 해소하세요.' }); }
+            if (hasBalconyRoad) { score -= 15; negativeItems.push({ title: '도로 정면 (路沖殺 가능성)', description: '거실에서 도로가 보입니다. T자형 도로일 가능성이 있습니다.', reason: '도로를 따라 흐르는 기운이 집을 직접 공격하는 형국입니다. 소음, 진동으로 인한 스트레스가 지속됩니다.', score: -15 }); solutions.push({ title: '도로 충살 비보책', description: '베란다에 키 큰 관엽식물(몬스테라, 고무나무)을 3개 이상 배치하세요.', reason: '식물이 돌진하는 기운을 완충시켜줍니다. 식물의 생명력이 나쁜 기운을 정화하고 시각적으로도 도로를 차단합니다.' }); }
+            if (formData.buildingType === '아파트' || formData.buildingType === '오피스텔') { if (floor <= 8) { score += 5; positiveItems.push({ title: '여유로운 단지 배치', description: `${formData.buildingType}이며 적정 층수에 위치해 있습니다.`, reason: '현대 건설사들은 풍수를 고려하여 단지를 배치합니다. 적정 밀도와 층수가 중요합니다.', score: 5 }); } }
+            if (formData.sunlightHours === '거의없음') { score -= 15; negativeItems.push({ title: '햇빛 부족', description: '하루 햇빛이 거의 들지 않아 음기가 강합니다.', reason: '햇빛이 부족하면 생기가 상실되고 무기력해집니다. 하루 최소 3시간 이상 햇빛이 필요합니다.', score: -15 }); solutions.push({ title: '햇빛 부족 해결책', description: '밝은 조명을 사용하고, 흰색/노란색 계열 인테리어로 양의 기운을 보충하세요.', reason: '인공 조명으로 어두움을 해소하고, 밝은 색상으로 심리적 밝음을 만들어야 합니다.' }); }
+            else if (formData.sunlightHours === '1-2시간') { score -= 5; negativeItems.push({ title: '햇빛 다소 부족', description: '하루 1-2시간만 햇빛이 들어 충분하지 않습니다.', reason: '최소 3시간 이상 햇빛이 들어야 생기가 충만합니다.', score: -5 }); }
+            else if (formData.sunlightHours === '3시간이상') { score += 5; positiveItems.push({ title: '충분한 채광', description: '하루 3시간 이상 햇빛이 들어와 생기가 넘칩니다.', reason: '충분한 햇빛은 양의 기운을 가득 채워줍니다.', score: 5 }); }
+            if (cemeteries > 0 || hospitals > 0) { score -= 15; negativeItems.push({ title: '음기 강한 시설 인근', description: `주변에 ${cemeteries > 0 ? '묘지' : ''}${cemeteries > 0 && hospitals > 0 ? ', ' : ''}${hospitals > 0 ? '병원' : ''}이 있습니다.`, reason: '음의 기운이 강한 시설이 근처에 있어 집안의 생기가 약해지고 우환이 생길 수 있습니다.', score: -15 }); solutions.push({ title: '음기 차단 비보책', description: '집안을 항상 밝게 유지하고, 붉은색 소품(그림, 쿠션)을 활용하여 양의 기운을 강화하세요. 현관에 소금을 두는 것도 좋습니다.', reason: '밝은 조명과 붉은 색상은 양의 기운을 강화하여 음기를 상쇄시킵니다.' }); }
+            if (hasBalconyRoad && formData.alleyPosition === '큰길T자') { score -= 25; negativeItems.push({ title: 'T자형 도로 끝 (路沖殺)', description: '도로가 집을 정면으로 향해 돌진하는 전형적인 흉지입니다.', reason: '도로의 기운이 집을 강하게 들이받아 사고와 구설수가 따를 수 있습니다. 현대적으로는 소음, 진동, 불빛이 직접 들어와 숙면을 방해합니다.', score: -25 }); solutions.push({ title: 'T자 도로 비보책', description: '현관이나 대문 앞에 팔괘경이나 볼록거울을 걸어 흉한 기운을 반사시키고, 키가 큰 화분을 두어 충돌하는 기운을 완화시키세요.', reason: '거울은 나쁜 기운을 반사하고, 식물은 완충 역할을 합니다.' }); }
+            if (formData.alleyPosition === '막다른끝') { score -= 10; negativeItems.push({ title: '막다른 골목 (막창집)', description: '골목 가장 안쪽에 위치한 집입니다.', reason: '기운은 순환해야 생성·성장하는데, 막다른 곳에서는 정체됩니다. 충살(衝殺)이 발생하여 3년 내 폐가 가능성도 있습니다.', score: -10 }); solutions.push({ title: '막다른 골목 비보책', description: '집 앞을 항상 밝고 깨끗하게 유지하고, 현관에 풍경(風磬)을 달아 소리로 정체된 기운을 활성화시키세요.', reason: '소리는 정체된 기운을 흐르게 만들고, 밝은 조명은 막힌 기운을 풀어줍니다.' }); }
+            if (hasBalconyBuilding) { score -= 10; negativeItems.push({ title: '건물 모서리 (尖角殺)', description: '주변 건물의 뾰족한 모서리가 보입니다.', reason: '뾰족한 모서리가 향하면 건강을 해치고 마음을 불안하게 만듭니다.', score: -10 }); solutions.push({ title: '건물 모서리 비보책', description: '모서리가 향하는 창문에 작은 거울을 두거나, 관엽식물 화분을 놓아 뾰족한 기운을 막고 분산시키세요.', reason: '식물과 거울이 날카로운 살기를 완화시켜줍니다.' }); }
+            if (formData.terrain.includes('비탈')) { score -= 15; negativeItems.push({ title: '비탈진 곳 (해수지)', description: '집이 비탈진 곳에 위치해 있습니다.', reason: '저지대를 등지고 고지대를 바라보면 재물운이 나쁩니다. 빗물이 뒤로 흐르면 재물도 함께 빠져나갑니다.', score: -15 }); solutions.push({ title: '비탈 비보책', description: '집의 뒤편에 담장을 높게 쌓거나 나무를 심어 기운이 빠져나가는 것을 막고, 집안 조명을 밝게 하여 양의 기운을 보충하세요.', reason: '담장과 나무가 기운의 흐름을 막아주고, 밝은 조명이 양의 기운을 강화합니다.' }); }
+            if (formData.terrain.includes('골짜기')) { score -= 20; negativeItems.push({ title: '골짜기 정면', description: '집이 골짜기를 정면으로 마주하고 있습니다.', reason: '골짜기를 통해 바람(냉기)이 들이쳐 운영이 안 되고 건강 문제가 생길 수 있습니다.', score: -20 }); solutions.push({ title: '골짜기 비보책', description: '골짜기 방향 창문에 두꺼운 커튼을 설치하고, 바람막이용 나무나 담장을 세우세요.', reason: '바람을 물리적으로 차단하여 냉기의 침입을 막아야 합니다.' }); }
+            if (formData.terrain.includes('평지') && !hasBalconyMountain && formData.buildingType === '단독주택') { score -= 15; negativeItems.push({ title: '사방이 뻥 뚫린 평지', description: '주변에 산이 없고 사방이 트인 평지입니다.', reason: '바람이 사방에서 몰아쳐 생기가 갈무리되지 않고 흩어집니다. 평안함을 느끼기 어렵습니다.', score: -15 }); solutions.push({ title: '평지 비보책', description: '집 주변에 나무를 심어 바람막이를 만들고, 담장을 설치하여 기운이 모일 수 있게 하세요.', reason: '인공적으로 산의 역할을 하는 장애물을 만들어 바람을 막고 기운을 모아야 합니다.' }); }
+            if (formData.buildingType === '아파트' && floor > 15) { score -= 10; negativeItems.push({ title: '밀집도 높은 고층 단지', description: '고층 아파트 밀집 지역입니다.', reason: '인구 과밀로 생태계가 교란되고, 채광과 통풍에 문제가 있을 수 있습니다.', score: -10 }); }
+            if (formData.balconyExpanded === '예') { score -= 5; negativeItems.push({ title: '확장형 발코니', description: '베란다를 확장했습니다.', reason: '외기(外氣)와 내기(內氣)가 직접 충돌합니다. 베란다는 완충 공간 역할을 하는데, 없어지면 기운이 충돌합니다.', score: -5 }); }
+            if (formData.terrain.includes('언덕') && hasBalconyMountain) { score -= 10; negativeItems.push({ title: '뒤에 급경사', description: '집 뒤에 급경사나 절벽이 있습니다.', reason: '지형이 불안정하여 기운이 억압되고, 심리적 불안감을 줍니다.', score: -10 }); }
+            if (mountains >= 2 && (formData.terrain.includes('평지') || formData.terrain.includes('언덕'))) { score += 10; positiveItems.push({ title: '좌청룡 우백호 (左靑龍 右白虎)', description: '좌우로 산이나 지형이 감싸주고 있습니다.', reason: '좌우의 지형이 바람을 막아주고 기운을 감싸 안아주는 안정적인 형세입니다.', score: 10 }); }
+            if (formData.terrain.includes('언덕') && !formData.terrain.includes('비탈')) { score += 15; positiveItems.push({ title: '전저후고 (前低後高)', description: '집터의 앞은 낮고 뒤는 높은 이상적인 지형입니다.', reason: '안정감이 있으며 좋은 기운이 들어와 머무는 명당의 조건입니다. 재물이 쌓이고 복이 머뭅니다.', score: 15 }); }
+            
+            let grade = '', emoji = '';
+            if (score >= 90) { grade = '천하제일 명당'; emoji = '🏆'; } 
+            else if (score >= 80) { grade = '훌륭한 터'; emoji = '🌟'; } 
+            else if (score >= 70) { grade = '괜찮은 집'; emoji = '👍'; } 
+            else if (score >= 60) { grade = '보통'; emoji = '😐'; } 
+            else if (score >= 50) { grade = '주의 필요'; emoji = '⚠️'; } 
+            else { grade = '이사 권장'; emoji = '❌'; }
+
+            await sleep(1000);
+
+            return {
+                address: formData.address,
+                formData,
+                totalScore: Math.min(100, Math.max(0, score)),
+                grade, emoji, positiveItems, negativeItems, solutions,
+                nearbyData: { mountains, rivers, parks, towers, tunnels, cemeteries, hospitals }
+            };
+        }
+
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderFormOptions();
+            
+            DOMElements.addressInput.addEventListener('input', updateFormState);
+            DOMElements.floorInput.addEventListener('input', updateFormState);
+            DOMElements.buildingTypeSelect.addEventListener('change', updateFormState);
+
+            renderApp();
+            
+            lucide.createIcons();
+        });
+    </script>
+
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
