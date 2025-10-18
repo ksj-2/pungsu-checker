@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -20,23 +21,11 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         /* Custom scrollbar for better aesthetics in dark mode */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1e293b; /* slate-800 */
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155; /* slate-700 */
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569; /* slate-600 */
-        }
-        /* Style for radio button checkmark */
-        input[type="radio"] {
-          box-shadow: none;
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        input[type="radio"] { box-shadow: none; }
     </style>
 <link rel="stylesheet" href="/index.css">
 </head>
@@ -182,22 +171,35 @@
 
                     <!-- 거실 조망 -->
                     <div>
-                        <div class="flex items-center justify-between mb-2">
-                             <label class="block text-xs sm:text-sm font-semibold text-slate-300">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-xs sm:text-sm font-semibold text-slate-300">
                                 거실 창문에서 보이는 것 (다중 선택)
                             </label>
-                            <button type="button" onclick="toggleExpand(this.nextElementSibling)" class="flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 py-1.5 px-2">
-                                <i data-lucide="help-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
-                                <span>왜 거실 기준인가요?</span>
+                            <button type="button" id="balcony-tip-toggle" class="flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                                <span>풍수 Tip</span>
                             </button>
                         </div>
-                        <div class="hidden bg-slate-900/50 p-3 rounded-md border border-slate-700 text-xs text-slate-400 mb-3 space-y-2">
-                            <p><strong class="text-emerald-400">거실은 집의 중심이자, 기운이 가장 많이 드나드는 공간(명당)</strong>이기 때문에 풍수에서 가장 중요하게 봅니다.</p>
-                            <p>가족 모두에게 영향을 미치는 거실을 기준으로 판단하는 것이 가장 정확합니다. 안방이나 작은방은 개인에게만 영향을 줍니다.</p>
+                         <div id="balcony-tip-content" class="hidden bg-cyan-900/20 p-3 rounded-md border border-cyan-400/30 mb-3 text-xs text-cyan-200/80 space-y-2">
+                            <p class="font-bold text-cyan-300">💡 왜 거실 기준인가요?</p>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>거실은 집의 중심이자, 기운이 가장 많이 드나드는 곳입니다.</li>
+                                <li>가족 모두의 운에 영향을 미치므로 풍수에서 가장 중요하게 봅니다.</li>
+                            </ul>
                         </div>
                         <p class="text-xs text-slate-400 mb-2 sm:mb-3">가장 큰 창문 기준</p>
                         <div id="balcony-view-options" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                              <!-- JS will populate this -->
+                        </div>
+                    </div>
+                    
+                    <!-- 강 모양 조건부 질문 -->
+                    <div id="river-shape-section" class="hidden">
+                        <label class="block text-xs sm:text-sm font-semibold mb-2 text-slate-300">
+                           🌊 강/하천이 집을 어떻게 감싸나요?
+                        </label>
+                        <div id="river-shape-options" class="space-y-2">
+                            <!-- JS will populate this -->
                         </div>
                     </div>
 
@@ -217,7 +219,7 @@
                             집의 위치
                         </label>
                         <div id="alley-options" class="space-y-2">
-                            <!-- JS will populate this with ILLUSTRATIONS -->
+                            <!-- JS will populate this -->
                         </div>
                     </div>
 
@@ -256,9 +258,9 @@
                     [광고 1] 디스플레이 반응형
                 </div>
             </section>
-
-            <!-- 로딩 섹션 (Initially hidden) -->
-            <section id="loading-section" class="hidden">
+            
+            <!-- 로딩 섹션 -->
+             <section id="loading-section" class="hidden">
                 <div class="mt-6 sm:mt-8 p-5 sm:p-6 bg-slate-800 rounded-lg border border-slate-700">
                     <h3 class="text-lg sm:text-xl font-semibold text-center text-emerald-400 mb-5 sm:mb-6">AI 정밀 분석 중</h3>
                     <div class="flex items-center justify-center gap-3">
@@ -268,7 +270,7 @@
                 </div>
             </section>
 
-            <!-- 결과 섹션 (Initially hidden) -->
+            <!-- 결과 섹션 -->
             <section id="result-section" class="hidden">
                 <div class="space-y-6 sm:space-y-8">
                     <!-- 점수 카드 -->
@@ -311,7 +313,7 @@
                     
                     <!-- 공유하기 섹션 -->
                     <div class="bg-gradient-to-r from-emerald-900/20 to-cyan-900/20 p-4 sm:p-6 rounded-lg border border-emerald-700/30">
-                        <div class="flex items-center justify-center gap-2 mb-3 sm:mb-4">
+                         <div class="flex items-center justify-center gap-2 mb-3 sm:mb-4">
                             <i data-lucide="share-2" class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400"></i>
                             <h3 class="text-lg sm:text-xl font-semibold text-slate-200">결과 공유하기</h3>
                         </div>
@@ -350,7 +352,6 @@
                         [광고 2] 디스플레이 수평 반응형
                     </div>
 
-                    <!-- 좋은 점 -->
                     <div id="positive-section" class="hidden">
                         <h3 class="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-slate-200 flex items-center gap-2">
                             <i data-lucide="check-circle" class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400"></i>
@@ -359,7 +360,6 @@
                         <div id="positive-items-container" class="space-y-2.5 sm:space-y-3"></div>
                     </div>
 
-                    <!-- 나쁜 점 -->
                     <div id="negative-section" class="hidden">
                         <h3 class="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-slate-200 flex items-center gap-2">
                             <i data-lucide="alert-triangle" class="w-5 h-5 sm:w-6 sm:h-6 text-red-400"></i>
@@ -372,7 +372,6 @@
                         [광고 3] 디스플레이 수평 반응형
                     </div>
 
-                    <!-- 비보책 -->
                     <div id="solutions-section" class="hidden">
                         <h3 class="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-slate-200 flex items-center gap-2">
                             <i data-lucide="shield-alert" class="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400"></i>
@@ -406,7 +405,7 @@
         // =================================================================
         
         // --- KAKAO SHARING SETUP ---
-        const KAKAO_JS_KEY = 'f90959efbc49398f80378e190c64ab18';
+        const KAKAO_JS_KEY = 'f90959efbc49398f80378e190c64ab18Y';
 
         (function() {
             const script = document.createElement('script');
@@ -414,29 +413,20 @@
             script.async = true;
             script.onload = () => {
                 if (window.Kakao && !window.Kakao.isInitialized() && KAKAO_JS_KEY !== 'YOUR_KAKAO_JAVASCRIPT_KEY') {
-                    try {
-                        window.Kakao.init(KAKAO_JS_KEY);
-                    } catch(e) {
-                        console.error("Kakao SDK initialization failed:", e);
-                    }
+                    try { window.Kakao.init(KAKAO_JS_KEY); } catch(e) { console.error("Kakao SDK initialization failed:", e); }
                 }
             };
             document.head.appendChild(script);
         })();
 
-
         // --- STATE MANAGEMENT ---
         let formData = {
             address: '', floor: '', direction: '', buildingType: '',
-            balconyView: [], sunlightHours: '', alleyPosition: '',
+            balconyView: [], riverShape: '', sunlightHours: '', alleyPosition: '',
             terrain: [], balconyExpanded: ''
         };
         let appState = {
-            loading: false,
-            result: null,
-            error: '',
-            loadingStep: '',
-            showDirectionGuide: false
+            loading: false, result: null, error: '', loadingStep: '', showDirectionGuide: false
         };
 
         // --- DOM ELEMENT REFERENCES ---
@@ -451,9 +441,12 @@
             addressInput: document.getElementById('address-input'),
             floorInput: document.getElementById('floor-input'),
             buildingTypeSelect: document.getElementById('building-type-select'),
+            balconyTipToggle: document.getElementById('balcony-tip-toggle'),
+            balconyTipContent: document.getElementById('balcony-tip-content'),
+            riverShapeSection: document.getElementById('river-shape-section'),
         };
 
-        // --- FORM OPTIONS (with ILLUSTRATIONS) ---
+        // --- FORM OPTIONS ---
         const FORM_OPTIONS = {
             directions: [
                 { value: '남향', label: '남향 (낮 12-2시에 해가 정면)' },
@@ -468,85 +461,208 @@
                 { value: '1-2시간', label: '1-2시간' },
                 { value: '3시간이상', label: '3시간 이상 (이상적!)' }
             ],
-            alleyOptions: [
-                { value: '큰길가', label: '큰 길가', illustration: '<svg viewBox="0 0 100 60"><path d="M0 20 H100" stroke="#475569" stroke-width="2" /><path fill="#10b981" d="M42 35 h16 v15 h-16 z" /><path fill="#10b981" d="M40 35 L50 25 L60 35 Z" /></svg>' },
-                { value: '골목중간', label: '골목 중간', illustration: '<svg viewBox="0 0 100 60"><path d="M0 20 H100" stroke="#475569" stroke-width="2" /><path stroke="#475569" fill="none" d="M12 35 h16 v15 h-16 z M9 35 L19 25 L29 35 Z" /><path fill="#10b981" d="M42 35 h16 v15 h-16 z" /><path fill="#10b981" d="M40 35 L50 25 L60 35 Z" /><path stroke="#475569" fill="none" d="M72 35 h16 v15 h-16 z M69 35 L79 25 L89 35 Z" /></svg>' },
-                { value: '교차로모퉁이', label: 'T자/교차로 모퉁이', illustration: '<svg viewBox="0 0 100 60"><path d="M0 30 H50 V60" stroke="#475569" stroke-width="2" /><path fill="#10b981" d="M62 25 h16 v15 h-16 z" /><path fill="#10b981" d="M60 25 L70 15 L80 25 Z" /></svg>' },
-                { value: '막다른끝', label: '막다른 골목 끝', illustration: '<svg viewBox="0 0 100 60"><path d="M80 10 V50 H20" stroke="#475569" stroke-width="2" /><path fill="#10b981" d="M42 2 h16 v15 h-16 z" /><path fill="#10b981" d="M40 2 L50 -8 L60 2 Z" /></svg>' },
-                { value: '큰길T자', label: 'T자형 도로 끝 (정면)', illustration: '<svg viewBox="0 0 100 60"><path d="M20 40 H80 M50 40 V10" stroke="#475569" stroke-width="2" /><path fill="#f87171" d="M42 45 h16 v15 h-16 z" /><path fill="#f87171" d="M40 45 L50 35 L60 45 Z" /></svg>' },
-                { value: 'Y자형도로', label: 'Y자형 도로 (가위 살)', illustration: '<svg viewBox="0 0 100 60"><path d="M20 5 L50 30 L80 5" stroke="#475569" stroke-width="2" /><path fill="#f87171" d="M42 35 h16 v15 h-16 z" /><path fill="#f87171" d="M40 35 L50 25 L60 35 Z" /></svg>' },
-                { value: '굽은도로바깥', label: '굽은 도로 바깥쪽 (반궁 살)', illustration: '<svg viewBox="0 0 100 60"><path d="M10 5 C 40 60, 60 60, 90 5" stroke="#475569" stroke-width="2" fill="none" /><path fill="#f87171" d="M42 35 h16 v15 h-16 z" /><path fill="#f87171" d="M40 35 L50 25 L60 35 Z" /></svg>' }
+             alleyOptions: [
+                { value: '큰길가', label: '큰 길가', icon: '<svg viewBox="0 0 80 50" class="w-full h-12"><path d="M0 25 H80" stroke="#475569" stroke-width="4"/><path d="M32.5 30 h15 v20 h-15z M32.5 30 L40 22 L47.5 30" fill="#14B8A6" stroke="#14B8A6" stroke-width="2" stroke-linejoin="round"/></svg>' },
+                { value: '골목중간', label: '골목 중간', icon: '<svg viewBox="0 0 80 50" class="w-full h-12"><path d="M0 25 H80" stroke="#475569" stroke-width="4"/><path d="M32.5 30 h15 v20 h-15z M32.5 30 L40 22 L47.5 30" fill="#14B8A6" stroke="#14B8A6" stroke-width="2" stroke-linejoin="round"/><path d="M2.5 30 h15 v20 h-15z M2.5 30 L10 22 L17.5 30" fill="none" stroke="#64748B" stroke-width="2" stroke-linejoin="round"/><path d="M62.5 30 h15 v20 h-15z M62.5 30 L70 22 L77.5 30" fill="none" stroke="#64748B" stroke-width="2" stroke-linejoin="round"/></svg>' },
+                { value: '교차로모퉁이', label: 'T자/교차로 모퉁이', icon: '<svg viewBox="0 0 80 50" class="w-full h-12"><path d="M0 25 H80 M40 0 V50" stroke="#475569" stroke-width="4"/><path d="M52.5 30 h15 v20 h-15z M52.5 30 L60 22 L67.5 30" fill="#14B8A6" stroke="#14B8A6" stroke-width="2" stroke-linejoin="round"/></svg>' },
+                { value: '큰길T자', label: 'T자형 도로 끝 (정면)', icon: '<svg viewBox="0 0 80 50" class="w-full h-12"><path d="M0 25 H80 M40 25 V50" stroke="#475569" stroke-width="4"/><path d="M32.5 0 h15 v20 h-15z M32.5 0 L40 -8 L47.5 0" fill="#F87171" stroke="#F87171" stroke-width="2" stroke-linejoin="round"/></svg>' },
+                { value: 'y자형도로', label: 'Y자형 도로 (가위 살)', icon: '<svg viewBox="0 0 80 50" class="w-full h-12"><path d="M40 50 V25 L10 0 M40 25 L70 0" stroke="#475569" stroke-width="4" /><path d="M32.5 10 h15 v20 h-15z M32.5 10 L40 2 L47.5 10" fill="#F87171" stroke="#F87171" stroke-width="2" stroke-linejoin="round"/></svg>'},
+                { value: '굽은도로바깥', label: '굽은 도로 바깥쪽 (반궁 살)', icon: '<svg viewBox="0 0 80 50" class="w-full h-12"><path d="M0 50 C 40 -10, 40 -10, 80 50" stroke="#475569" stroke-width="4" fill="none"/><path d="M32.5 0 h15 v20 h-15z M32.5 0 L40 -8 L47.5 0" fill="#F87171" stroke="#F87171" stroke-width="2" stroke-linejoin="round"/></svg>'},
+                { value: '막다른끝', label: '막다른 골목 끝', icon: '<svg viewBox="0 0 80 50" class="w-full h-12"><path d="M0 25 H60 M60 5 V45" stroke="#475569" stroke-width="4"/><path d="M12.5 30 h15 v20 h-15z M12.5 30 L20 22 L27.5 30" fill="#14B8A6" stroke="#14B8A6" stroke-width="2" stroke-linejoin="round"/></svg>' }
+            ],
+             riverShapeOptions: [
+                { value: '궁수', label: '집을 감싸는 모양 (궁수)', icon: '<svg viewBox="0 0 80 50" class="w-full h-10"><path d="M0 0 C 40 60, 40 60, 80 0" stroke="#38BDF8" stroke-width="4" fill="none"/><path d="M32.5 30 h15 v20 h-15z M32.5 30 L40 22 L47.5 30" fill="#14B8A6" stroke="#14B8A6" stroke-width="2" stroke-linejoin="round"/></svg>' },
+                { value: '반궁수', label: '집을 등지는 모양 (반궁수)', icon: '<svg viewBox="0 0 80 50" class="w-full h-10"><path d="M0 50 C 40 -10, 40 -10, 80 50" stroke="#38BDF8" stroke-width="4" fill="none"/><path d="M32.5 0 h15 v20 h-15z M32.5 0 L40 -8 L47.5 0" fill="#F87171" stroke="#F87171" stroke-width="2" stroke-linejoin="round"/></svg>' }
             ],
             terrainOptions: ['평지', '비탈', '골짜기', '언덕'],
-            balconyExpandedOptions: [
-                { value: '예' },
-                { value: '아니오' }
-            ]
+            balconyExpandedOptions: [ { value: '예' }, { value: '아니오' } ]
         };
 
-        // --- UI RENDERING FUNCTIONS ---
+        // --- UI RENDERING & EVENT HANDLERS ---
         function renderFormOptions() {
-            // Direction
-            const directionContainer = document.getElementById('direction-options');
-            directionContainer.innerHTML = FORM_OPTIONS.directions.map(dir => `
-                <label class="flex items-center gap-2.5 sm:gap-3 p-3 sm:p-3.5 rounded-md border cursor-pointer transition-colors active:scale-98 bg-slate-900 border-slate-600 hover:border-slate-500">
-                    <input type="radio" name="direction" value="${dir.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
-                    <span class="text-xs sm:text-sm text-slate-200">${dir.label}</span>
-                </label>
-            `).join('');
-
-            // Balcony View
-            const viewContainer = document.getElementById('balcony-view-options');
-            viewContainer.innerHTML = FORM_OPTIONS.viewOptions.map(view => `
-                <button type="button" onclick="toggleMultiSelect('balconyView', this, '${view}')" class="px-3 sm:px-4 py-2.5 sm:py-3 rounded-md border transition-colors text-xs sm:text-sm active:scale-95 bg-slate-900 border-slate-600 hover:border-emerald-400">
-                    ${view}
-                </button>
-            `).join('');
-
-            // Sunlight
-            const sunlightContainer = document.getElementById('sunlight-options');
-            sunlightContainer.innerHTML = FORM_OPTIONS.sunlightOptions.map(opt => `
-                <label class="flex items-center gap-2.5 sm:gap-3 p-3 sm:p-3.5 rounded-md border cursor-pointer transition-colors active:scale-98 bg-slate-900 border-slate-600 hover:border-slate-500">
-                    <input type="radio" name="sunlightHours" value="${opt.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
-                    <span class="text-xs sm:text-sm text-slate-200">${opt.label}</span>
-                </label>
-            `).join('');
+            const createRadio = (name, opt, container) => {
+                 const label = document.createElement('label');
+                 label.className = `flex items-center gap-3 p-3 rounded-md border cursor-pointer transition-colors active:scale-98 bg-slate-900 border-slate-600 hover:border-slate-500`;
+                 label.innerHTML = `
+                    <input type="radio" name="${name}" value="${opt.value}" onchange="updateFormState()" class="w-5 h-5 flex-shrink-0 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
+                    <div class="flex-grow">${opt.icon || ''}</div>
+                    <span class="text-xs sm:text-sm text-slate-200 flex-grow text-right">${opt.label}</span>`;
+                 container.appendChild(label);
+            };
+            const createRadioSimple = (name, opt, container) => {
+                const label = document.createElement('label');
+                label.className = `flex items-center gap-2.5 sm:gap-3 p-3 sm:p-3.5 rounded-md border cursor-pointer transition-colors active:scale-98 bg-slate-900 border-slate-600 hover:border-slate-500`;
+                label.innerHTML = `<input type="radio" name="${name}" value="${opt.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
+                                   <span class="text-xs sm:text-sm text-slate-200">${opt.label}</span>`;
+                container.appendChild(label);
+            };
+            const createRadioCenter = (name, opt, container) => {
+                 const label = document.createElement('label');
+                label.className = `flex items-center justify-center gap-2 p-3 sm:p-3.5 rounded-md border cursor-pointer transition-colors active:scale-95 bg-slate-900 border-slate-600 hover:border-slate-500`;
+                label.innerHTML = `<input type="radio" name="${name}" value="${opt.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
+                                   <span class="text-xs sm:text-sm text-slate-200">${opt.value}</span>`;
+                container.appendChild(label);
+            };
+            const createButton = (field, value, container) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.textContent = value;
+                button.className = 'px-3 sm:px-4 py-2.5 sm:py-3 rounded-md border transition-colors text-xs sm:text-sm active:scale-95 bg-slate-900 border-slate-600 hover:border-emerald-400';
+                button.onclick = () => toggleMultiSelect(field, button, value);
+                container.appendChild(button);
+            };
             
-            // Alley Position (with illustrations)
-            const alleyContainer = document.getElementById('alley-options');
-            alleyContainer.innerHTML = FORM_OPTIONS.alleyOptions.map(opt => `
-                <label class="flex flex-col items-center p-3 sm:p-3.5 rounded-md border cursor-pointer transition-colors active:scale-98 bg-slate-900 border-slate-600 hover:border-slate-500">
-                    <input type="radio" name="alleyPosition" value="${opt.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 sr-only">
-                    <div class="w-full h-24 bg-slate-800 rounded-md mb-3 flex items-center justify-center">${opt.illustration}</div>
-                    <span class="text-xs sm:text-sm text-slate-200">${opt.label}</span>
-                </label>
-            `).join('');
-            
-            // Terrain
-            const terrainContainer = document.getElementById('terrain-options');
-            terrainContainer.innerHTML = FORM_OPTIONS.terrainOptions.map(terrain => `
-                 <button type="button" onclick="toggleMultiSelect('terrain', this, '${terrain}')" class="px-3 sm:px-4 py-2.5 sm:py-3 rounded-md border transition-colors text-xs sm:text-sm active:scale-95 bg-slate-900 border-slate-600 hover:border-emerald-400">
-                    ${terrain}
-                </button>
-            `).join('');
-            
-            // Balcony Expanded
-            const balconyExpandedContainer = document.getElementById('balcony-expanded-options');
-            balconyExpandedContainer.innerHTML = FORM_OPTIONS.balconyExpandedOptions.map(opt => `
-                <label class="flex items-center justify-center gap-2 p-3 sm:p-3.5 rounded-md border cursor-pointer transition-colors active:scale-95 bg-slate-900 border-slate-600 hover:border-slate-500">
-                    <input type="radio" name="balconyExpanded" value="${opt.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
-                    <span class="text-xs sm:text-sm text-slate-200">${opt.value}</span>
-                </label>
-            `).join('');
+            FORM_OPTIONS.directions.forEach(opt => createRadioSimple('direction', opt, document.getElementById('direction-options')));
+            FORM_OPTIONS.viewOptions.forEach(val => createButton('balconyView', val, document.getElementById('balcony-view-options')));
+            FORM_OPTIONS.sunlightOptions.forEach(opt => createRadioSimple('sunlightHours', opt, document.getElementById('sunlight-options')));
+            FORM_OPTIONS.alleyOptions.forEach(opt => createRadio('alleyPosition', opt, document.getElementById('alley-options')));
+            FORM_OPTIONS.riverShapeOptions.forEach(opt => createRadio('riverShape', opt, document.getElementById('river-shape-options')));
+            FORM_OPTIONS.terrainOptions.forEach(val => createButton('terrain', val, document.getElementById('terrain-options')));
+            FORM_OPTIONS.balconyExpandedOptions.forEach(opt => createRadioCenter('balconyExpanded', opt, document.getElementById('balcony-expanded-options')));
         }
 
+        function updateFormState() {
+            formData.address = DOMElements.addressInput.value;
+            formData.floor = DOMElements.floorInput.value;
+            formData.buildingType = DOMElements.buildingTypeSelect.value;
+            
+            const getRadioVal = name => document.querySelector(`input[name="${name}"]:checked`)?.value || '';
+            formData.direction = getRadioVal('direction');
+            formData.sunlightHours = getRadioVal('sunlightHours');
+            formData.alleyPosition = getRadioVal('alleyPosition');
+            formData.riverShape = getRadioVal('riverShape');
+            formData.balconyExpanded = getRadioVal('balconyExpanded');
+
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                const label = radio.closest('label');
+                if (!label) return;
+                const isChecked = radio.checked;
+                label.classList.toggle('bg-emerald-900/30', isChecked);
+                label.classList.toggle('border-emerald-500', isChecked);
+                label.classList.toggle('bg-slate-900', !isChecked);
+                label.classList.toggle('border-slate-600', !isChecked);
+            });
+        }
+        
+        function toggleMultiSelect(field, element, value) {
+            const index = formData[field].indexOf(value);
+            if (index > -1) {
+                formData[field].splice(index, 1);
+                element.classList.remove('bg-emerald-600', 'border-emerald-500', 'text-white');
+            } else {
+                formData[field].push(value);
+                element.classList.add('bg-emerald-600', 'border-emerald-500', 'text-white');
+            }
+            if (field === 'balconyView' && value === '강/하천') {
+                const isSelected = formData.balconyView.includes('강/하천');
+                DOMElements.riverShapeSection.classList.toggle('hidden', !isSelected);
+                if (!isSelected) {
+                    const riverRadio = document.querySelector('input[name="riverShape"]:checked');
+                    if(riverRadio) riverRadio.checked = false;
+                    formData.riverShape = '';
+                    updateFormState();
+                }
+            }
+        }
+        
+        function toggleDirectionGuide(show) {
+            appState.showDirectionGuide = show;
+            DOMElements.directionGuideModal.classList.toggle('hidden', !show);
+        }
+
+        function toggleExpand(buttonElement) {
+            const content = buttonElement.nextElementSibling;
+            const icon = buttonElement.querySelector('[data-lucide^="chevron"]');
+            content.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        }
+
+        async function handleAnalyze() {
+            updateFormState(); 
+            if (!formData.address || !formData.floor || !formData.direction || !formData.buildingType || 
+                !formData.sunlightHours || !formData.alleyPosition || !formData.balconyExpanded) {
+                appState.error = '모든 항목을 입력해주세요.';
+                renderApp();
+                return;
+            }
+            appState.error = '';
+            appState.result = null;
+            appState.loading = true;
+            renderApp();
+
+            try {
+                const report = await realAnalyzeFengShui(formData, (step) => {
+                    appState.loadingStep = step;
+                    renderApp();
+                });
+                appState.result = report;
+            } catch (e) {
+                appState.error = e.message || '분석 중 오류가 발생했습니다.';
+            } finally {
+                appState.loading = false;
+                renderApp();
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function resetApp() {
+            window.location.reload();
+        }
+
+        function shareToKakao() {
+            const result = appState.result;
+            if (!result) return;
+            if (!window.Kakao || !window.Kakao.isInitialized()) {
+                alert('카카오톡 공유 기능을 사용하려면 카카오 JavaScript 키를 설정하고 앱을 등록해야 합니다.');
+                return;
+            }
+            window.Kakao.Share.sendDefault({
+                objectType: 'feed',
+                content: {
+                    title: '우리집 풍수 진단 결과',
+                    description: `${result.address}의 풍수 점수는 ${result.totalScore}점! ${result.grade} ${result.emoji}`,
+                    imageUrl: 'https://picsum.photos/seed/fengshui/800/400',
+                    link: { mobileWebUrl: window.location.href, webUrl: window.location.href },
+                },
+                buttons: [{
+                    title: '우리집도 진단하기',
+                    link: { mobileWebUrl: window.location.origin, webUrl: window.location.origin },
+                }],
+            });
+        }
+
+        function shareToFacebook() {
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
+        }
+
+        function shareToTwitter() {
+            const result = appState.result;
+            if (!result) return;
+            const text = encodeURIComponent(`우리집 풍수 점수는 ${result.totalScore}점! ${result.grade} ${result.emoji}\n`);
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=400');
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                document.getElementById('copy-link-default').classList.add('hidden');
+                document.getElementById('copy-link-success').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('copy-link-default').classList.remove('hidden');
+                    document.getElementById('copy-link-success').classList.add('hidden');
+                }, 2000);
+            }).catch(() => {
+                alert('링크 복사에 실패했습니다.');
+            });
+        }
+        
+        // This function was missing. It controls the visibility of different sections.
         function renderApp() {
-            // Show/hide main sections
             DOMElements.formSection.classList.toggle('hidden', appState.loading || appState.result);
             DOMElements.loadingSection.classList.toggle('hidden', !appState.loading);
             DOMElements.resultSection.classList.toggle('hidden', !appState.result);
 
-            // Update error message
             if (appState.error) {
                 DOMElements.errorMessage.textContent = appState.error;
                 DOMElements.errorMessage.classList.remove('hidden');
@@ -554,17 +670,15 @@
                 DOMElements.errorMessage.classList.add('hidden');
             }
 
-            // Update loading step
             if (appState.loading) {
                 DOMElements.loadingStep.textContent = appState.loadingStep;
             }
 
-            // Render result data if available
             if (appState.result) {
                 renderResultData(appState.result);
             }
         }
-
+        
         function renderResultData(result) {
             document.getElementById('result-address').textContent = result.address;
             document.getElementById('result-details').textContent = `${result.formData.floor}층 ${result.formData.direction} ${result.formData.buildingType}`;
@@ -587,7 +701,7 @@
         function renderScoreGauge(score) {
             const circle = document.getElementById('score-gauge-circle');
             const textContainer = document.getElementById('score-gauge-text');
-            const circumference = 2 * Math.PI * 52; // 326.72...
+            const circumference = 2 * Math.PI * 52; 
             const offset = circumference - (score / 100) * circumference;
 
             let colorClass = 'text-emerald-400';
@@ -642,7 +756,7 @@
             `).join('');
             lucide.createIcons();
         }
-
+        
         function renderSolutions(solutions) {
             const container = document.getElementById('solutions-container');
             const section = document.getElementById('solutions-section');
@@ -667,184 +781,10 @@
             lucide.createIcons();
         }
 
-
-        // --- EVENT HANDLERS & LOGIC ---
-        
-        function updateFormState() {
-            formData.address = DOMElements.addressInput.value;
-            formData.floor = DOMElements.floorInput.value;
-            formData.buildingType = DOMElements.buildingTypeSelect.value;
-            
-            const selectedDirection = document.querySelector('input[name="direction"]:checked');
-            formData.direction = selectedDirection ? selectedDirection.value : '';
-            
-            const selectedSunlight = document.querySelector('input[name="sunlightHours"]:checked');
-            formData.sunlightHours = selectedSunlight ? selectedSunlight.value : '';
-            
-            const selectedAlley = document.querySelector('input[name="alleyPosition"]:checked');
-            formData.alleyPosition = selectedAlley ? selectedAlley.value : '';
-            
-            const selectedBalcony = document.querySelector('input[name="balconyExpanded"]:checked');
-            formData.balconyExpanded = selectedBalcony ? selectedBalcony.value : '';
-
-            document.querySelectorAll('input[type="radio"]').forEach(radio => {
-                const label = radio.closest('label');
-                if (label) {
-                    if (radio.checked) {
-                        label.classList.add('bg-emerald-900/30', 'border-emerald-500');
-                        label.classList.remove('bg-slate-900', 'border-slate-600', 'hover:border-slate-500');
-                    } else {
-                        label.classList.remove('bg-emerald-900/30', 'border-emerald-500');
-                        label.classList.add('bg-slate-900', 'border-slate-600', 'hover:border-slate-500');
-                    }
-                }
-            });
-        }
-        
-        function toggleMultiSelect(field, element, value) {
-            const index = formData[field].indexOf(value);
-            if (index > -1) {
-                formData[field].splice(index, 1);
-                element.classList.remove('bg-emerald-600', 'border-emerald-500', 'text-white');
-                element.classList.add('bg-slate-900', 'border-slate-600', 'hover:border-emerald-400');
-            } else {
-                formData[field].push(value);
-                element.classList.add('bg-emerald-600', 'border-emerald-500', 'text-white');
-                element.classList.remove('bg-slate-900', 'border-slate-600', 'hover:border-emerald-400');
-            }
-        }
-        
-        function toggleDirectionGuide(show) {
-            appState.showDirectionGuide = show;
-            DOMElements.directionGuideModal.classList.toggle('hidden', !show);
-        }
-
-        function toggleExpand(element) {
-            const isHidden = element.classList.contains('hidden');
-            element.classList.toggle('hidden');
-             const button = element.previousElementSibling.querySelector('button');
-             if (button) {
-                const icon = button.querySelector('[data-lucide^="chevron"]');
-                if(icon) {
-                    icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-                }
-             }
-        }
-
-        async function handleAnalyze() {
-            updateFormState(); 
-            if (!formData.address || !formData.floor || !formData.direction || !formData.buildingType || 
-                !formData.sunlightHours || !formData.alleyPosition || !formData.balconyExpanded) {
-                appState.error = '모든 항목을 입력해주세요.';
-                renderApp();
-                return;
-            }
-            appState.error = '';
-            appState.result = null;
-            appState.loading = true;
-            renderApp();
-
-            try {
-                const report = await realAnalyzeFengShui(formData, (step) => {
-                    appState.loadingStep = step;
-                    renderApp();
-                });
-                appState.result = report;
-            } catch (e) {
-                appState.error = e.message || '분석 중 오류가 발생했습니다.';
-            } finally {
-                appState.loading = false;
-                renderApp();
-            }
-        }
-
-        function resetApp() {
-            appState = {
-                loading: false, result: null, error: '', loadingStep: '',
-                showDirectionGuide: false
-            };
-            formData = {
-                address: '', floor: '', direction: '', buildingType: '',
-                balconyView: [], sunlightHours: '', alleyPosition: '',
-                terrain: [], balconyExpanded: ''
-            };
-            DOMElements.mainForm.reset();
-            
-            document.querySelectorAll('#balcony-view-options button, #terrain-options button').forEach(btn => {
-                btn.classList.remove('bg-emerald-600', 'border-emerald-500', 'text-white');
-                btn.classList.add('bg-slate-900', 'border-slate-600', 'hover:border-emerald-400');
-            });
-            document.querySelectorAll('input[type="radio"]').forEach(radio => {
-                 const label = radio.closest('label');
-                 if(label) {
-                    label.classList.remove('bg-emerald-900/30', 'border-emerald-500');
-                    label.classList.add('bg-slate-900', 'border-slate-600', 'hover:border-slate-500');
-                 }
-            });
-            renderApp();
-        }
-
-        // --- SHARING FUNCTIONS ---
-        function shareToKakao() {
-            const result = appState.result;
-            if (!result) return;
-            if (!window.Kakao || !window.Kakao.isInitialized()) {
-                alert('카카오톡 공유 기능을 사용하려면 카카오 JavaScript 키를 설정하고 앱을 등록해야 합니다.');
-                return;
-            }
-            window.Kakao.Share.sendDefault({
-                objectType: 'feed',
-                content: {
-                    title: '우리집 풍수 진단 결과',
-                    description: `${result.address}의 풍수 점수는 ${result.totalScore}점! ${result.grade} ${result.emoji}`,
-                    imageUrl: 'https://picsum.photos/seed/fengshui/800/400',
-                    link: { mobileWebUrl: window.location.href, webUrl: window.location.href },
-                },
-                buttons: [{
-                    title: '우리집도 진단하기',
-                    link: { mobileWebUrl: window.location.origin, webUrl: window.location.origin },
-                }],
-            });
-        }
-
-        function shareToFacebook() {
-            const url = encodeURIComponent(window.location.href);
-            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
-        }
-
-        function shareToTwitter() {
-            const result = appState.result;
-            if (!result) return;
-            const text = encodeURIComponent(`우리집 풍수 점수는 ${result.totalScore}점! ${result.grade} ${result.emoji}\n`);
-            const url = encodeURIComponent(window.location.href);
-            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=400');
-        }
-
-        function copyLink() {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                document.getElementById('copy-link-default').classList.add('hidden');
-                document.getElementById('copy-link-success').classList.remove('hidden');
-                setTimeout(() => {
-                    document.getElementById('copy-link-default').classList.remove('hidden');
-                    document.getElementById('copy-link-success').classList.add('hidden');
-                }, 2000);
-            }).catch(() => {
-                alert('링크 복사에 실패했습니다.');
-            });
-        }
-
         // --- REAL ANALYSIS LOGIC with Vercel Proxy ---
         async function realAnalyzeFengShui(formData, setLoadingStep) {
             const sleep = ms => new Promise(r => setTimeout(r, ms));
-            
-            // =========================================================================
-            //  ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
-            //  이곳에 Vercel에서 복사한 '심부름꾼' 주소를 붙여넣어 주세요!
-            //  =========================================================================
             const VERCEL_PROXY_URL = 'https://pungsu-backend.vercel.app';
-            //  ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
-            // =========================================================================
-
             if (VERCEL_PROXY_URL === '여기에_복사한_Vercel_주소를_붙여넣으세요') {
                 throw new Error('Vercel 프록시 주소가 설정되지 않았습니다. index.html 파일을 수정해주세요.');
             }
@@ -855,13 +795,10 @@
                 const response = await fetch(`${VERCEL_PROXY_URL}/api/proxy?address=${encodeURIComponent(formData.address)}`);
                 if (!response.ok) throw new Error(`서버 응답 오류: ${response.status}`);
                 const data = await response.json();
-
                 if (data.documents && data.documents.length > 0) {
                     const { x, y } = data.documents[0];
                     coords = { lat: parseFloat(y), lng: parseFloat(x) };
-                } else {
-                    throw new Error('주소를 찾을 수 없습니다. 좀 더 자세히 입력해보세요.');
-                }
+                } else { throw new Error('주소를 찾을 수 없습니다. 좀 더 자세히 입력해보세요.'); }
             } catch (error) {
                 console.error('Error fetching coordinates:', error);
                 throw new Error(`주소 변환 중 오류가 발생했습니다: ${error.message}`);
@@ -874,17 +811,13 @@
                     if (!response.ok) return 0;
                     const data = await response.json();
                     return data.documents?.length || 0;
-                } catch (e) {
-                    console.error(`Error searching for ${keyword}:`, e);
-                    return 0;
-                }
+                } catch (e) { console.error(`Error searching for ${keyword}:`, e); return 0; }
             };
 
             setLoadingStep('주변 지형 분석 중...');
             const mountains = await searchNearby('산', 1000);
             const rivers = await searchNearby('강', 1000);
             await sleep(500);
-            
             setLoadingStep('주변 환경 분석 중...');
             const parks = await searchNearby('공원', 500);
             const towers = await searchNearby('송전탑', 200);
@@ -892,52 +825,46 @@
             const cemeteries = await searchNearby('묘지', 500);
             const hospitals = await searchNearby('병원', 300);
             await sleep(800);
-            
             setLoadingStep('풍수 점수 계산 중...');
             let score = 70;
-            const positiveItems = [];
-            const negativeItems = [];
-            const solutions = [];
-
+            const positiveItems = [], negativeItems = [], solutions = [];
             const floor = parseInt(formData.floor);
             const hasBalconyMountain = formData.balconyView.includes('산');
             const hasBalconyRiver = formData.balconyView.includes('강/하천');
             const hasBalconyBuilding = formData.balconyView.includes('건물');
             const hasBalconyRoad = formData.balconyView.includes('도로');
 
-            if (mountains > 0 && rivers > 0 && hasBalconyMountain && hasBalconyRiver) { score += 20; positiveItems.push({ title: '배산임수 (背山臨水) 완벽 구현', description: `뒤로 ${mountains}개의 산이 받쳐주고 앞으로 ${rivers}개의 물이 흐르는 전형적인 명당입니다.`, reason: '등받이 의자에 앉은 것처럼 편안하고 안정적인 기운을 받습니다. 산은 든든한 지원을, 물은 재물운을 가져다줍니다.', score: 20 }); }
-            else if (mountains > 0 && hasBalconyMountain) { score += 10; positiveItems.push({ title: '배산 (背山) - 든든한 뒷배', description: `주변 ${mountains}개의 산이 뒤에서 받쳐주는 형태입니다.`, reason: '산이 바람을 막아주고 안정감을 주며, 귀인의 도움을 받는 운이 있습니다.', score: 10 }); }
-            if (rivers > 0 && hasBalconyRiver) { score += 15; positiveItems.push({ title: '수간재물 (水干財物)', description: `거실에서 ${rivers}개의 수계가 보이며, 물이 재물을 관장합니다.`, reason: '물은 재물을 상징하며, 특히 궁수 형태(물이 집을 감싸는)라면 재물이 쌓입니다.', score: 15 }); }
+            // --- SCORING LOGIC ---
+            if (formData.riverShape === '궁수') { score += 15; positiveItems.push({ title: '금성환포 (金星環抱) - 궁수', description: '강이 집을 감싸 안는 형태로, 재물이 모이고 귀인의 도움을 받는 최고의 명당입니다.', reason: '물이란 재물을 뜻하며, 물이 나를 감싸는 것은 재물이 나에게 모이는 형국입니다.', score: 15 }); } 
+            else if (formData.riverShape === '반궁수') { score -= 15; negativeItems.push({ title: '반궁수 (反弓水) - 배신과 이탈', description: '강이 집을 등지고 활처럼 휘어 나가, 재물이 흩어지고 인심을 잃기 쉽습니다.', reason: '물이 등을 돌리고 나가는 것은 재물과 사람이 나를 떠나가는 형국입니다. 심리적 불안감을 유발합니다.', score: -15 }); solutions.push({ title: '반궁수 비보책', description: '강이 보이는 창가에 팔괘경이나 볼록거울을 두어 흉한 기운을 반사시키고, 집안에 관엽식물을 많이 두어 생기를 보충하세요.', reason: '거울은 나쁜 기운을 쳐내는 역할을 하며, 식물의 생명력은 흩어지는 기운을 안정시키는 데 도움을 줍니다.' }); } 
+            else if (rivers > 0 && hasBalconyRiver) { score += 5; positiveItems.push({ title: '수간재물 (水干財物)', description: `거실에서 ${rivers}개의 수계가 보여 재물운에 도움이 됩니다.`, reason: '물은 재물을 상징합니다. 강의 모양을 선택하면 더 정확한 분석이 가능합니다.', score: 5 }); }
+            if (mountains > 0 && hasBalconyMountain) { score += 10; positiveItems.push({ title: '배산 (背山) - 든든한 뒷배', description: `주변 ${mountains}개의 산이 뒤에서 받쳐주는 형태입니다.`, reason: '산이 바람을 막아주고 안정감을 주며, 귀인의 도움을 받는 운이 있습니다.', score: 10 }); }
             if (parks > 0) { score += 10; positiveItems.push({ title: '명당 (明堂) - 넓은 공간', description: `주변 ${parks}개의 공원이 있어 기운이 모일 넓은 공간이 있습니다.`, reason: '집 앞에 넓고 깨끗한 공간이 있으면 재물운이 상승하고 생기가 넘칩니다.', score: 10 }); }
-            if (floor >= 3 && floor <= 8) { score += 10; positiveItems.push({ title: `지기 강한 ${floor}층`, description: '나무가 자랄 수 있는 높이(20m) 내에 있어 땅의 기운을 충분히 받습니다.', reason: '지기는 3-8층까지 미치며, 이 범위가 건강과 생명력이 가장 왕성합니다. 나무가 자랄 수 있는 높이 = 땅의 기운이 닿는 범위입니다.', score: 10 }); }
-            else if (floor >= 15) { score -= 20; negativeItems.push({ title: `고층 ${floor}층 - 지기 부족`, description: '15층 이상 고층으로 땅의 기운이 미치지 않습니다.', reason: '고층일수록 땅의 자기장이 약해지며, 연구 결과 임신율 감소, 불면증, 어지럼증이 나타납니다. 풍수에서는 "하체가 약해진다"고 표현합니다.', score: -20 }); solutions.push({ title: '고층 지기 보완책', description: '실내에 흙을 많이 담은 큰 화분을 여러 개 두고, 천연석(화강암, 옥석) 소품을 배치하세요.', reason: '식물의 흙과 돌의 철분이 미세하게나ma 지자기를 전달합니다. 침대 밑에 황토볼이나 숯을 두는 것도 전통적인 방법입니다.' }); }
-            if (formData.direction === '남향') { score += 10; positiveItems.push({ title: '정남향', description: '햇빛이 하루 3시간 이상 잘 들어 생기가 넘칩니다.', reason: '특히 낮 12-2시에 햇빛이 정면으로 들어와 양의 기운이 가득합니다. 건강에 가장 좋은 방향입니다.', score: 10 }); }
+            if (floor >= 3 && floor <= 8) { score += 10; positiveItems.push({ title: `지기 강한 ${floor}층`, description: '나무가 자랄 수 있는 높이(20m) 내에 있어 땅의 기운을 충분히 받습니다.', reason: '지기는 3-8층까지 미치며, 이 범위가 건강과 생명력이 가장 왕성합니다.', score: 10 }); }
+            else if (floor >= 15) { score -= 20; negativeItems.push({ title: `고층 ${floor}층 - 지기 부족`, description: '15층 이상 고층으로 땅의 기운이 미치지 않습니다.', reason: '고층일수록 땅의 자기장이 약해지며, 연구 결과 임신율 감소, 불면증, 어지럼증이 나타납니다.', score: -20 }); solutions.push({ title: '고층 지기 보완책', description: '실내에 흙을 많이 담은 큰 화분을 여러 개 두고, 천연석 소품을 배치하세요.', reason: '식물의 흙과 돌이 미세하게나마 지자기를 전달합니다.' }); }
+            if (formData.direction === '남향') { score += 10; positiveItems.push({ title: '정남향', description: '햇빛이 하루 3시간 이상 잘 들어 생기가 넘칩니다.', reason: '특히 낮 12-2시에 햇빛이 정면으로 들어와 양의 기운이 가득합니다.', score: 10 }); }
             else if (formData.direction === '동향') { score += 5; positiveItems.push({ title: '동향 - 아침 햇살', description: '아침 햇살이 들어와 하루를 활기차게 시작할 수 있습니다.', reason: '아침 햇빛은 하루의 기운을 시작하는 길한 에너지입니다.', score: 5 }); }
             else if (formData.direction === '서향') { score -= 5; negativeItems.push({ title: '서향 - 오후 햇빛', description: '오후 4-6시에 강한 햇빛이 들어와 여름에 더울 수 있습니다.', reason: '저녁 햇빛은 밤의 시작을 알리는 기운으로, 생기를 빼앗을 수 있습니다.', score: -5 }); }
-            else if (formData.direction === '북향') { score -= 10; negativeItems.push({ title: '북향 - 햇빛 부족', description: '햇빛이 거의 들지 않아 음습할 수 있습니다.', reason: '햇빛이 부족하면 생기가 상실되고 무기력해집니다. 양의 기운이 약합니다.', score: -10 }); }
-            if (towers > 0) { score -= 20; negativeItems.push({ title: '송전탑 인근 (高壓線)', description: `200m 내에 ${towers}개의 송전탑이 있어 강한 전자기장의 영향을 받습니다.`, reason: '땅의 기운을 어지럽히고 건강에 해롭습니다. 집안의 기운이 혼란스러워집니다.', score: -20 }); solutions.push({ title: '송전탑 비보책', description: '창가에 수정(크리스탈)을 놓아 나쁜 기운을 정화하고, 숯을 집안 곳곳에 두어 전자파를 흡수하도록 합니다.', reason: '수정은 전자파를 정화하는 효과가 있으며, 숯은 전자파 차단 능력이 뛰어납니다.' }); }
-            if (tunnels > 0) { score -= 30; negativeItems.push({ title: '터널 근처 (隧道) - 치명적!', description: `500m 내에 ${tunnels}개의 터널이 있습니다. 산의 혈맥을 자르는 가장 치명적인 흉지입니다.`, reason: '터널은 땅의 혈관을 자르는 것으로, 기운이 터지듯 빠져나갑니다. 주변의 기운까지 쓸려 들어갑니다.', score: -30 }); solutions.push({ title: '터널 근처 유일한 방법', description: '베란다에 수조를 두고 물을 담아 나쁜 기운을 차단하세요. 하지만 근본적 해결은 어렵습니다.', reason: '물은 흐르는 기운을 막아주지만, 터널의 영향은 매우 강력합니다. 장기적으로는 이주를 고려하는 것이 좋습니다.' }); }
-            if (hasBalconyBuilding && !hasBalconyMountain) { score -= 15; negativeItems.push({ title: '앞을 가로막는 건물', description: '거실 앞쪽에 건물이 조망을 막고 있습니다.', reason: '"내 인생을 막는 산"이 되어 하는 일이 잘 풀리지 않고 답답함을 느낍니다. 심리적으로도 우울감을 유발합니다.', score: -15 }); solutions.push({ title: '막힌 조망 개선책', description: '거실 창가에 거울을 45도 각도로 배치하여 시야를 확장시키세요.', reason: '거울이 막힌 시야를 확장시키는 착시 효과를 줍니다. 밝은 색상의 커튼과 조명으로 답답함을 해소하세요.' }); }
-            if (hasBalconyRoad && !(formData.alleyPosition === '큰길T자' || formData.alleyPosition === '교차로모퉁이' || formData.alleyPosition === 'Y자형도로' || formData.alleyPosition === '굽은도로바깥')) { score -= 15; negativeItems.push({ title: '도로 인접', description: '거실에서 도로가 보입니다. 기운이 안정되기 어렵습니다.', reason: '도로를 따라 흐르는 기운이 집안의 기운을 흔들 수 있습니다. 소음, 진동으로 인한 스트레스가 지속됩니다.', score: -15 }); solutions.push({ title: '도로 소음 비보책', description: '베란다에 키 큰 관엽식물(몬스테라, 고무나무)을 3개 이상 배치하세요.', reason: '식물이 소음과 나쁜 기운을 완충시켜줍니다. 식물의 생명력이 나쁜 기운을 정화하고 시각적으로도 도로를 차단합니다.' }); }
-            if (formData.buildingType === '아파트' || formData.buildingType === '오피스텔') { if (floor <= 8) { score += 5; positiveItems.push({ title: '여유로운 단지 배치', description: `${formData.buildingType}이며 적정 층수에 위치해 있습니다.`, reason: '현대 건설사들은 풍수를 고려하여 단지를 배치합니다. 적정 밀도와 층수가 중요합니다.', score: 5 }); } }
-            if (formData.sunlightHours === '거의없음') { score -= 15; negativeItems.push({ title: '햇빛 부족', description: '하루 햇빛이 거의 들지 않아 음기가 강합니다.', reason: '햇빛이 부족하면 생기가 상실되고 무기력해집니다. 하루 최소 3시간 이상 햇빛이 필요합니다.', score: -15 }); solutions.push({ title: '햇빛 부족 해결책', description: '밝은 조명을 사용하고, 흰색/노란색 계열 인테리어로 양의 기운을 보충하세요.', reason: '인공 조명으로 어두움을 해소하고, 밝은 색상으로 심리적 밝음을 만들어야 합니다.' }); }
+            else if (formData.direction === '북향') { score -= 10; negativeItems.push({ title: '북향 - 햇빛 부족', description: '햇빛이 거의 들지 않아 음습할 수 있습니다.', reason: '햇빛이 부족하면 생기가 상실되고 무기력해집니다.', score: -10 }); }
+            if (towers > 0) { score -= 20; negativeItems.push({ title: '송전탑 인근 (高壓線)', description: `200m 내에 ${towers}개의 송전탑이 있어 강한 전자기장의 영향을 받습니다.`, reason: '땅의 기운을 어지럽히고 건강에 해롭습니다.', score: -20 }); solutions.push({ title: '송전탑 비보책', description: '창가에 수정(크리스탈)을 놓아 나쁜 기운을 정화하고, 숯을 집안 곳곳에 두어 전자파를 흡수하도록 합니다.', reason: '수정은 전자파를 정화하는 효과가 있으며, 숯은 전자파 차단 능력이 뛰어납니다.' }); }
+            if (tunnels > 0) { score -= 30; negativeItems.push({ title: '터널 근처 (隧道) - 치명적!', description: `500m 내에 ${tunnels}개의 터널이 있습니다. 산의 혈맥을 자르는 가장 치명적인 흉지입니다.`, reason: '터널은 땅의 혈관을 자르는 것으로, 기운이 터지듯 빠져나갑니다.', score: -30 }); solutions.push({ title: '터널 근처 유일한 방법', description: '베란다에 수조를 두고 물을 담아 나쁜 기운을 차단하세요. 하지만 근본적 해결은 어렵습니다.', reason: '물은 흐르는 기운을 막아주지만, 터널의 영향은 매우 강력합니다.' }); }
+            if (hasBalconyBuilding && !hasBalconyMountain) { score -= 15; negativeItems.push({ title: '앞을 가로막는 건물', description: '거실 앞쪽에 건물이 조망을 막고 있습니다.', reason: '"내 인생을 막는 산"이 되어 하는 일이 잘 풀리지 않고 답답함을 느낍니다.', score: -15 }); solutions.push({ title: '막힌 조망 개선책', description: '거실 창가에 거울을 45도 각도로 배치하여 시야를 확장시키세요.', reason: '거울이 막힌 시야를 확장시키는 착시 효과를 줍니다.' }); }
+            if (formData.sunlightHours === '거의없음') { score -= 15; negativeItems.push({ title: '햇빛 부족', description: '하루 햇빛이 거의 들지 않아 음기가 강합니다.', reason: '햇빛이 부족하면 생기가 상실되고 무기력해집니다.', score: -15 }); solutions.push({ title: '햇빛 부족 해결책', description: '밝은 조명을 사용하고, 흰색/노란색 계열 인테리어로 양의 기운을 보충하세요.', reason: '인공 조명으로 어두움을 해소하고, 밝은 색상으로 심리적 밝음을 만들어야 합니다.' }); }
             else if (formData.sunlightHours === '1-2시간') { score -= 5; negativeItems.push({ title: '햇빛 다소 부족', description: '하루 1-2시간만 햇빛이 들어 충분하지 않습니다.', reason: '최소 3시간 이상 햇빛이 들어야 생기가 충만합니다.', score: -5 }); }
             else if (formData.sunlightHours === '3시간이상') { score += 5; positiveItems.push({ title: '충분한 채광', description: '하루 3시간 이상 햇빛이 들어와 생기가 넘칩니다.', reason: '충분한 햇빛은 양의 기운을 가득 채워줍니다.', score: 5 }); }
-            if (cemeteries > 0 || hospitals > 0) { score -= 15; negativeItems.push({ title: '음기 강한 시설 인근', description: `주변에 ${cemeteries > 0 ? '묘지' : ''}${cemeteries > 0 && hospitals > 0 ? ', ' : ''}${hospitals > 0 ? '병원' : ''}이 있습니다.`, reason: '음의 기운이 강한 시설이 근처에 있어 집안의 생기가 약해지고 우환이 생길 수 있습니다.', score: -15 }); solutions.push({ title: '음기 차단 비보책', description: '집안을 항상 밝게 유지하고, 붉은색 소품(그림, 쿠션)을 활용하여 양의 기운을 강화하세요. 현관에 소금을 두는 것도 좋습니다.', reason: '밝은 조명과 붉은 색상은 양의 기운을 강화하여 음기를 상쇄시킵니다.' }); }
-            if (formData.alleyPosition === '큰길T자') { score -= 25; negativeItems.push({ title: 'T자형 도로 끝 (路沖殺)', description: '도로가 집을 정면으로 향해 돌진하는 전형적인 흉지입니다.', reason: '도로의 기운이 집을 강하게 들이받아 사고와 구설수가 따를 수 있습니다. 현대적으로는 소음, 진동, 불빛이 직접 들어와 숙면을 방해합니다.', score: -25 }); solutions.push({ title: 'T자 도로 비보책', description: '현관이나 대문 앞에 팔괘경이나 볼록거울을 걸어 흉한 기운을 반사시키고, 키가 큰 화분을 두어 충돌하는 기운을 완화시키세요.', reason: '거울은 나쁜 기운을 반사하고, 식물은 완충 역할을 합니다.' }); }
-            if (formData.alleyPosition === '교차로모퉁이') { score -= 10; negativeItems.push({ title: '교차로 모퉁이', description: '차가 꺾이는 모퉁이에 위치하여 기운이 불안정합니다.', reason: '차량의 불빛과 소음이 잦고, 기운이 직선으로 흐르지 못하고 꺾이는 지점이라 산만합니다. 안정적으로 재물이 모이기 어렵습니다.', score: -10 }); solutions.push({ title: '모퉁이 비보책', description: '해당 방향 창가에 두꺼운 커튼을 치고, 둥근 잎을 가진 관엽 식물을 두어 날카로운 기운을 완화시키세요.', reason: '커튼은 물리적인 차단 역할을 하며, 둥근 잎 식물은 부드러운 기운으로 산만한 기운을 중화시킵니다.' }); }
-            if (formData.alleyPosition === '막다른끝') { score -= 10; negativeItems.push({ title: '막다른 골목 (막창집)', description: '골목 가장 안쪽에 위치한 집입니다.', reason: '기운은 순환해야 생성·성장하는데, 막다른 곳에서는 정체됩니다. 충살(衝殺)이 발생하여 3년 내 폐가 가능성도 있습니다.', score: -10 }); solutions.push({ title: '막다른 골목 비보책', description: '집 앞을 항상 밝고 깨끗하게 유지하고, 현관에 풍경(風磬)을 달아 소리로 정체된 기운을 활성화시키세요.', reason: '소리는 정체된 기운을 흐르게 만들고, 밝은 조명은 막힌 기운을 풀어줍니다.' }); }
-            if (formData.alleyPosition === 'Y자형도로') { score -= 20; negativeItems.push({ title: 'Y자형 도로 (剪刀煞)', description: '갈라지는 도로 사이에 위치한 가위 모양의 흉지입니다.', reason: '두 도로의 기운이 충돌하고 흩어지는 지점이라 매우 불안정합니다. 재물 손실과 가족 간의 불화를 유발할 수 있습니다.', score: -20 }); solutions.push({ title: 'Y자 도로 비보책', description: '기운이 충돌하는 꼭짓점 방향에 둥근 모양의 돌이나 큰 화분을 두어 흉한 기운을 완화시키세요.', reason: '둥근 물체는 날카로운 가위의 기운을 부드럽게 중화시키는 역할을 합니다.' }); }
-            if (formData.alleyPosition === '굽은도로바깥') { score -= 20; negativeItems.push({ title: '굽은 도로 바깥쪽 (反弓煞)', description: '활처럼 굽은 도로의 바깥쪽에 위치한 흉지입니다.', reason: '도로를 지나는 차들의 원심력이 만들어내는 흉한 기운(살기)이 계속해서 집을 때리는 형상입니다. 재물이 모이지 않고 흩어집니다.', score: -20 }); solutions.push({ title: '굽은 도로 비보책', description: '도로 방향으로 담장을 쌓거나 나무를 여러 그루 심어 일종의 방어막을 만드세요. 현관에 작은 거울을 다는 것도 좋습니다.', reason: '담장과 나무는 날아오는 살기를 막아주는 물리적, 기운적 방패 역할을 합니다.' }); }
+            if (cemeteries > 0 || hospitals > 0) { score -= 15; negativeItems.push({ title: '음기 강한 시설 인근', description: `주변에 ${cemeteries > 0 ? '묘지' : ''}${cemeteries > 0 && hospitals > 0 ? ', ' : ''}${hospitals > 0 ? '병원' : ''}이 있습니다.`, reason: '음의 기운이 강한 시설이 근처에 있어 집안의 생기가 약해지고 우환이 생길 수 있습니다.', score: -15 }); solutions.push({ title: '음기 차단 비보책', description: '집안을 항상 밝게 유지하고, 붉은색 소품(그림, 쿠션)을 활용하여 양의 기운을 강화하세요.', reason: '밝은 조명과 붉은 색상은 양의 기운을 강화하여 음기를 상쇄시킵니다.' }); }
+            if (formData.alleyPosition === '큰길T자') { score -= 25; negativeItems.push({ title: 'T자형 도로 끝 (路沖殺)', description: '도로가 집을 정면으로 향해 돌진하는 전형적인 흉지입니다.', reason: '도로의 기운이 집을 강하게 들이받아 사고와 구설수가 따를 수 있습니다.', score: -25 }); solutions.push({ title: 'T자 도로 비보책', description: '현관이나 대문 앞에 팔괘경이나 볼록거울을 걸어 흉한 기운을 반사시키고, 키가 큰 화분을 두어 충돌하는 기운을 완화시키세요.', reason: '거울은 나쁜 기운을 반사하고, 식물은 완충 역할을 합니다.' }); }
+            if (formData.alleyPosition === 'y자형도로') { score -= 20; negativeItems.push({ title: 'Y자형 도로 (가위 살)', description: '갈라지는 도로 사이에 위치하여 기운이 매우 불안정합니다.', reason: '마치 가위의 날 사이에 집이 놓인 형상이라 하여 기운이 불안정하고 사고수가 따를 수 있습니다.', score: -20 }); solutions.push({ title: 'Y자 도로 비보책', description: '기운이 충돌하는 지점(집 앞)에 둥근 화분이나 작은 수경 시설을 두어 기운의 흐름을 완화시키세요.', reason: '물과 둥근 형태는 날카로운 살기를 부드럽게 만들어주는 효과가 있습니다.' }); }
+            if (formData.alleyPosition === '굽은도로바깥') { score -= 20; negativeItems.push({ title: '굽은 도로 바깥쪽 (반궁 살)', description: '굽은 도로의 바깥쪽에 위치하여 흉한 기운을 받습니다.', reason: '도로를 달리는 차들의 원심력이 만들어내는 살기(煞氣)가 계속해서 집을 향해 날아오는 형상으로, 재물이 흩어지고 건강을 해칠 수 있습니다.', score: -20 }); solutions.push({ title: '반궁 살 비보책', description: '도로가 보이는 방향으로 산수유나 대나무 같이 곧게 뻗은 나무를 심거나, 해당 창문에 블라인드를 설치하여 기운을 차단하세요.', reason: '곧은 나무는 날아오는 살기를 막아주는 방패 역할을 하며, 블라인드는 물리적인 차단 효과가 있습니다.' }); }
+            if (formData.alleyPosition === '교차로모퉁이') { score -= 10; negativeItems.push({ title: '교차로 모퉁이', description: '차가 꺾이는 모퉁이에 위치하여 기운이 불안정합니다.', reason: '차량의 불빛과 소음이 잦고, 기운이 꺾이는 지점이라 산만합니다.', score: -10 }); solutions.push({ title: '모퉁이 비보책', description: '해당 방향 창가에 두꺼운 커튼을 치고, 둥근 잎을 가진 관엽 식물을 두어 날카로운 기운을 완화시키세요.', reason: '커튼은 물리적인 차단 역할을 하며, 둥근 잎 식물은 부드러운 기운으로 산만한 기운을 중화시킵니다.' }); }
+            if (formData.alleyPosition === '막다른끝') { score -= 10; negativeItems.push({ title: '막다른 골목 (막창집)', description: '골목 가장 안쪽에 위치한 집입니다.', reason: '기운은 순환해야 하는데, 막다른 곳에서는 정체됩니다.', score: -10 }); solutions.push({ title: '막다른 골목 비보책', description: '집 앞을 항상 밝고 깨끗하게 유지하고, 현관에 풍경(風磬)을 달아 소리로 정체된 기운을 활성화시키세요.', reason: '소리는 정체된 기운을 흐르게 만듭니다.' }); }
             if (hasBalconyBuilding) { score -= 10; negativeItems.push({ title: '건물 모서리 (尖角殺)', description: '주변 건물의 뾰족한 모서리가 보입니다.', reason: '뾰족한 모서리가 향하면 건강을 해치고 마음을 불안하게 만듭니다.', score: -10 }); solutions.push({ title: '건물 모서리 비보책', description: '모서리가 향하는 창문에 작은 거울을 두거나, 관엽식물 화분을 놓아 뾰족한 기운을 막고 분산시키세요.', reason: '식물과 거울이 날카로운 살기를 완화시켜줍니다.' }); }
-            if (formData.terrain.includes('비탈')) { score -= 15; negativeItems.push({ title: '비탈진 곳 (해수지)', description: '집이 비탈진 곳에 위치해 있습니다.', reason: '저지대를 등지고 고지대를 바라보면 재물운이 나쁩니다. 빗물이 뒤로 흐르면 재물도 함께 빠져나갑니다.', score: -15 }); solutions.push({ title: '비탈 비보책', description: '집의 뒤편에 담장을 높게 쌓거나 나무를 심어 기운이 빠져나가는 것을 막고, 집안 조명을 밝게 하여 양의 기운을 보충하세요.', reason: '담장과 나무가 기운의 흐름을 막아주고, 밝은 조명이 양의 기운을 강화합니다.' }); }
-            if (formData.terrain.includes('골짜기')) { score -= 20; negativeItems.push({ title: '골짜기 정면', description: '집이 골짜기를 정면으로 마주하고 있습니다.', reason: '골짜기를 통해 바람(냉기)이 들이쳐 운영이 안 되고 건강 문제가 생길 수 있습니다.', score: -20 }); solutions.push({ title: '골짜기 비보책', description: '골짜기 방향 창문에 두꺼운 커튼을 설치하고, 바람막이용 나무나 담장을 세우세요.', reason: '바람을 물리적으로 차단하여 냉기의 침입을 막아야 합니다.' }); }
-            if (formData.terrain.includes('평지') && !hasBalconyMountain && formData.buildingType === '단독주택') { score -= 15; negativeItems.push({ title: '사방이 뻥 뚫린 평지', description: '주변에 산이 없고 사방이 트인 평지입니다.', reason: '바람이 사방에서 몰아쳐 생기가 갈무리되지 않고 흩어집니다. 평안함을 느끼기 어렵습니다.', score: -15 }); solutions.push({ title: '평지 비보책', description: '집 주변에 나무를 심어 바람막이를 만들고, 담장을 설치하여 기운이 모일 수 있게 하세요.', reason: '인공적으로 산의 역할을 하는 장애물을 만들어 바람을 막고 기운을 모아야 합니다.' }); }
-            if (formData.buildingType === '아파트' && floor > 15) { score -= 10; negativeItems.push({ title: '밀집도 높은 고층 단지', description: '고층 아파트 밀집 지역입니다.', reason: '인구 과밀로 생태계가 교란되고, 채광과 통풍에 문제가 있을 수 있습니다.', score: -10 }); }
-            if (formData.balconyExpanded === '예') { score -= 5; negativeItems.push({ title: '확장형 발코니', description: '베란다를 확장했습니다.', reason: '외기(外氣)와 내기(內氣)가 직접 충돌합니다. 베란다는 완충 공간 역할을 하는데, 없어지면 기운이 충돌합니다.', score: -5 }); }
-            if (formData.terrain.includes('언덕') && hasBalconyMountain) { score -= 10; negativeItems.push({ title: '뒤에 급경사', description: '집 뒤에 급경사나 절벽이 있습니다.', reason: '지형이 불안정하여 기운이 억압되고, 심리적 불안감을 줍니다.', score: -10 }); }
+            if (formData.terrain.includes('비탈')) { score -= 15; negativeItems.push({ title: '비탈진 곳 (해수지)', description: '집이 비탈진 곳에 위치해 있습니다.', reason: '저지대를 등지고 고지대를 바라보면 재물운이 나쁩니다.', score: -15 }); solutions.push({ title: '비탈 비보책', description: '집의 뒤편에 담장을 높게 쌓거나 나무를 심어 기운이 빠져나가는 것을 막으세요.', reason: '담장과 나무가 기운의 흐름을 막아줍니다.' }); }
+            if (formData.terrain.includes('골짜기')) { score -= 20; negativeItems.push({ title: '골짜기 정면', description: '집이 골짜기를 정면으로 마주하고 있습니다.', reason: '골짜기를 통해 바람(냉기)이 들이쳐 건강 문제가 생길 수 있습니다.', score: -20 }); solutions.push({ title: '골짜기 비보책', description: '골짜기 방향 창문에 두꺼운 커튼을 설치하고, 바람막이용 나무나 담장을 세우세요.', reason: '바람을 물리적으로 차단하여 냉기의 침입을 막아야 합니다.' }); }
+            if (formData.terrain.includes('평지') && !hasBalconyMountain && formData.buildingType === '단독주택') { score -= 15; negativeItems.push({ title: '사방이 뻥 뚫린 평지', description: '주변에 산이 없고 사방이 트인 평지입니다.', reason: '바람이 사방에서 몰아쳐 생기가 흩어집니다.', score: -15 }); solutions.push({ title: '평지 비보책', description: '집 주변에 나무를 심어 바람막이를 만들고, 담장을 설치하여 기운이 모일 수 있게 하세요.', reason: '인공적으로 산의 역할을 하는 장애물을 만들어 바람을 막고 기운을 모아야 합니다.' }); }
+            if (formData.balconyExpanded === '예') { score -= 5; negativeItems.push({ title: '확장형 발코니', description: '베란다를 확장했습니다.', reason: '외기(外氣)와 내기(內氣)가 직접 충돌하는 완충 공간이 없습니다.', score: -5 }); }
             if (mountains >= 2 && (formData.terrain.includes('평지') || formData.terrain.includes('언덕'))) { score += 10; positiveItems.push({ title: '좌청룡 우백호 (左靑龍 右白虎)', description: '좌우로 산이나 지형이 감싸주고 있습니다.', reason: '좌우의 지형이 바람을 막아주고 기운을 감싸 안아주는 안정적인 형세입니다.', score: 10 }); }
-            if (formData.terrain.includes('언덕') && !formData.terrain.includes('비탈')) { score += 15; positiveItems.push({ title: '전저후고 (前低後高)', description: '집터의 앞은 낮고 뒤는 높은 이상적인 지형입니다.', reason: '안정감이 있으며 좋은 기운이 들어와 머무는 명당의 조건입니다. 재물이 쌓이고 복이 머뭅니다.', score: 15 }); }
+            if (formData.terrain.includes('언덕') && !formData.terrain.includes('비탈')) { score += 15; positiveItems.push({ title: '전저후고 (前低後高)', description: '집터의 앞은 낮고 뒤는 높은 이상적인 지형입니다.', reason: '안정감이 있으며 좋은 기운이 들어와 머무는 명당의 조건입니다.', score: 15 }); }
             
             let grade = '', emoji = '';
             if (score >= 90) { grade = '천하제일 명당'; emoji = '🏆'; } 
@@ -950,29 +877,26 @@
             await sleep(1000);
 
             return {
-                address: formData.address,
-                formData,
+                address: formData.address, formData,
                 totalScore: Math.min(100, Math.max(0, score)),
                 grade, emoji, positiveItems, negativeItems, solutions,
                 nearbyData: { mountains, rivers, parks, towers, tunnels, cemeteries, hospitals }
             };
         }
 
-
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             renderFormOptions();
-            
             DOMElements.addressInput.addEventListener('input', updateFormState);
             DOMElements.floorInput.addEventListener('input', updateFormState);
             DOMElements.buildingTypeSelect.addEventListener('change', updateFormState);
-
+            DOMElements.balconyTipToggle.addEventListener('click', () => {
+                DOMElements.balconyTipContent.classList.toggle('hidden');
+            });
             renderApp();
-            
             lucide.createIcons();
         });
     </script>
-
 <script type="module" src="/index.tsx"></script>
 </body>
 </html>
