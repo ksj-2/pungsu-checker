@@ -1,252 +1,33 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>우리집 풍수 보기 🏠</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Malgun Gothic', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-        }
-        
-        h1 {
-            font-size: 32px;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        
-        input {
-            width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            transition: border 0.3s;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 40px;
-            font-size: 18px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: transform 0.2s;
-            width: 100%;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        button:active {
-            transform: translateY(0);
-        }
-        
-        #result {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            display: none;
-        }
-        
-        #result.show {
-            display: block;
-            animation: fadeIn 0.5s;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .score {
-            font-size: 64px;
-            font-weight: bold;
-            color: #667eea;
-            margin: 20px 0;
-        }
-        
-        .stars {
-            font-size: 32px;
-            margin: 10px 0;
-        }
-        
-        .detail {
-            text-align: left;
-            margin-top: 20px;
-            padding: 15px;
-            background: white;
-            border-radius: 10px;
-        }
-        
-        .good {
-            color: #28a745;
-            margin: 10px 0;
-        }
-        
-        .bad {
-            color: #dc3545;
-            margin: 10px 0;
-        }
-        
-        .footer {
-            margin-top: 30px;
-            font-size: 12px;
-            color: #999;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🏠 우리집 풍수 보기</h1>
-        <p class="subtitle">집 주소를 입력하면 풍수 점수를 알려드려요!</p>
-        
-        <input type="text" id="address" placeholder="예: 서울시 강남구 테헤란로 123">
-        
-        <button onclick="checkPungsu()">🔮 풍수 분석하기</button>
-        
-        <div id="result">
-            <h2>✨ 분석 완료!</h2>
-            <div class="score" id="scoreDisplay">85</div>
-            <div class="stars">⭐⭐⭐⭐⭐</div>
-            
-            <div class="detail">
-                <div class="good">
-                    <strong>✅ 좋은 점:</strong>
-                    <p id="goodPoints">집 뒤에 산이 있어 안정적이에요!</p>
-                </div>
-                
-                <div class="bad">
-                    <strong>⚠️ 개선점:</strong>
-                    <p id="badPoints">왼쪽이 조금 허해요. 큰 화분을 두면 좋아요!</p>
-                </div>
-            </div>
-            
-            <button onclick="shareResult()" style="margin-top: 20px; background: #28a745;">
-                📤 친구에게 공유하기
-            </button>
-        </div>
-        
-        <div class="footer">
-            재미로 보는 풍수 점수입니다 😊
-        </div>
-    </div>
-    
-    <script>
-        function checkPungsu() {
-            const address = document.getElementById('address').value;
-            
-            if (!address) {
-                alert('주소를 입력해주세요!');
-                return;
-            }
-            
-            // 랜덤 점수 생성 (70~100점)
-            const score = Math.floor(Math.random() * 31) + 70;
-            
-            // 점수에 따른 별 개수
-            let stars = '';
-            const starCount = Math.floor(score / 20);
-            for (let i = 0; i < starCount; i++) {
-                stars += '⭐';
-            }
-            
-            // 랜덤 좋은 점
-            const goodList = [
-                '집 뒤에 산이 있어 안정적이에요!',
-                '집 앞에 물길이 흘러 재물운이 좋아요!',
-                '좌우가 잘 막혀 있어 보호받는 느낌이에요!',
-                '도로가 집을 감싸고 있어 좋아요!'
-            ];
-            
-            // 랜덤 나쁜 점
-            const badList = [
-                '왼쪽이 조금 허해요. 큰 화분을 두면 좋아요!',
-                '집 앞 경사가 있네요. 현관에 매트를 두세요!',
-                '뒤쪽이 비어있어요. 그림을 걸어보세요!',
-                '오른쪽을 보완하면 더 좋을 것 같아요!'
-            ];
-            
-            const randomGood = goodList[Math.floor(Math.random() * goodList.length)];
-            const randomBad = badList[Math.floor(Math.random() * badList.length)];
-            
-            // 결과 표시
-            document.getElementById('scoreDisplay').textContent = score;
-            document.querySelector('.stars').textContent = stars;
-            document.getElementById('goodPoints').textContent = randomGood;
-            document.getElementById('badPoints').textContent = randomBad;
-            
-            const result = document.getElementById('result');
-            result.classList.add('show');
-            
-            // 결과로 스크롤
-            result.scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        function shareResult() {
-            const score = document.getElementById('scoreDisplay').textContent;
-            const text = `우리집 풍수 점수는 ${score}점! 당신도 확인해보세요!`;
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: '우리집 풍수 보기',
-                    text: text,
-                    url: window.location.href
-                });
-            } else {
-                // 모바일이 아니면 클립보드 복사
-                navigator.clipboard.writeText(text + ' ' + window.location.href);
-                alert('링크가 복사되었습니다!');
-            }
-        }
-    </script>
-</body>
-</html>
-```
+// api/proxy.js
 
----
+export default async function handler(request, response) {
+  // 1. 웹사이트에서 보낸 '주소' 정보를 꺼냅니다.
+  const { address } = request.query;
+  
+  if (!address) {
+    return response.status(400).json({ error: '주소를 입력해주세요.' });
+  }
 
-### **Step 4: 저장하기**
-```
-맨 아래로 스크롤
-    ↓
-"Commit new file" 초록색 버튼 클릭!
+  // 2. Vercel에 숨겨둔 나의 비밀 카카오 API 키를 가져옵니다.
+  const KAKAO_API_KEY = process.env.KAKAO_API_KEY;
+
+  // 3. 이 키를 가지고 진짜 카카오 서버에 데이터를 요청합니다.
+  const kakaoResponse = await fetch(
+    `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(address)}`,
+    {
+      headers: {
+        Authorization: `KakaoAK ${KAKAO_API_KEY}`,
+      },
+    }
+  );
+
+  const data = await kakaoResponse.json();
+  
+  // 4. 카카오에서 받은 결과를 웹사이트에 다시 전달해줍니다.
+  // CORS 헤더 추가: 다른 도메인(GitHub Pages)에서 내 Vercel 서버로 요청할 수 있게 허용해주는 설정
+  response.setHeader('Access-Control-Allow-Origin', '*');
+  response.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  return response.status(200).json(data);
+}
