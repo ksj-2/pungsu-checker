@@ -3,7 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>우리집 풍수 체커</title>
+    
+    <!-- SEO & Sharing Optimization -->
+    <title>우리집 풍수 진단 | 무료 풍수지리, 집터, 명당, 이사방향 전문가 분석</title>
+    <meta name="description" content="이사, 자취, 내 집 마련 전 필수 확인! 풍수 전문가가 알려주는 우리집 집터, 명당, 이사방향을 무료로 분석해 드립니다. AI 셀프 풍수 진단으로 좋은 기운을 확인하세요.">
+    <meta name="keywords" content="풍수, 풍수지리, 풍수전문가, 명당, 집터, 이사방향, 무료풍수, 아파트풍수, 이사풍수, 자취방풍수, AI풍수, 우리집풍수, 풍수점수, 풍수진단">
+    
+    <!-- Open Graph Tags for Social Sharing -->
+    <meta property="og:title" content="우리집 풍수 진단 | 무료 풍수지리, 집터, 명당, 이사방향 전문가 분석">
+    <meta property="og:description" content="이사, 자취, 내 집 마련 전 필수 확인! AI 셀프 풍수 진단으로 우리집 집터, 명당, 이사방향을 무료로 분석하고 좋은 기운을 확인하세요.">
+    <meta property="og:image" content="https://picsum.photos/seed/fengshui_og/1200/630">
+    <meta property="og:url" content="https://ksj-2.github.io/pungsu-checker/">
+    <meta property="og:type" content="website">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -37,7 +49,7 @@
             <div class="flex justify-center items-center gap-2 sm:gap-4 mb-2">
                 <i data-lucide="mountain" class="w-8 h-8 sm:w-12 sm:h-12 text-emerald-400"></i>
                 <h1 class="text-2xl sm:text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
-                    우리집 풍수 체커
+                    우리집 풍수 진단
                 </h1>
                 <i data-lucide="waves" class="w-8 h-8 sm:w-12 sm:h-12 text-cyan-400"></i>
             </div>
@@ -189,13 +201,13 @@
                         </div>
                     </div>
 
-                    <!-- 골목 위치 -->
+                    <!-- 집의 위치 (개선된 버전) -->
                     <div>
                         <label class="block text-xs sm:text-sm font-semibold mb-2 text-slate-300">
                             집의 위치
                         </label>
-                        <div id="alley-options" class="space-y-2">
-                            <!-- JS will populate this -->
+                        <div id="alley-options" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <!-- JS will populate this with icons -->
                         </div>
                     </div>
 
@@ -293,7 +305,7 @@
                             <i data-lucide="share-2" class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400"></i>
                             <h3 class="text-lg sm:text-xl font-semibold text-slate-200">결과 공유하기</h3>
                         </div>
-                        <p class="text-center text-slate-400 text-xs sm:text-sm mb-4">친구들에게도 풍수 체커를 알려주세요!</p>
+                        <p class="text-center text-slate-400 text-xs sm:text-sm mb-4">친구들에게도 우리집 풍수 진단을 알려주세요!</p>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                             <button onclick="shareToKakao()" class="flex flex-col items-center gap-2 p-3 sm:p-4 bg-[#FEE500] hover:bg-[#FDD835] text-[#3C1E1E] rounded-lg transition-all active:scale-95">
                                 <i data-lucide="message-circle" class="w-6 h-6 sm:w-7 sm:h-7"></i>
@@ -373,7 +385,7 @@
         </main>
 
         <footer class="w-full max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8 text-center text-slate-500 text-xs sm:text-sm border-t border-slate-800">
-            <p>© 2025 우리집 풍수 체커. 카카오맵 기반 실제 데이터 분석</p>
+            <p>© 2025 우리집 풍수 진단. 카카오맵 기반 실제 데이터 분석</p>
         </footer>
     </div>
     
@@ -431,7 +443,7 @@
             buildingTypeSelect: document.getElementById('building-type-select'),
         };
 
-        // --- FORM OPTIONS ---
+        // --- FORM OPTIONS (with ICONS) ---
         const FORM_OPTIONS = {
             directions: [
                 { value: '남향', label: '남향 (낮 12-2시에 해가 정면)' },
@@ -447,10 +459,11 @@
                 { value: '3시간이상', label: '3시간 이상 (이상적!)' }
             ],
             alleyOptions: [
-                { value: '큰길가', label: '큰 길가' },
-                { value: '골목중간', label: '골목 중간' },
-                { value: '막다른끝', label: '막다른 골목 끝' },
-                { value: '큰길T자', label: 'T자형 도로 끝' }
+                { value: '큰길가', label: '큰 길가', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><rect x="10" y="14" width="4" height="6"/></svg>` },
+                { value: '골목중간', label: '골목 중간', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><rect x="3" y="14" width="4" height="6"/><rect x="10" y="14" width="4" height="6"/><rect x="17" y="14" width="4" height="6"/></svg>` },
+                { value: '교차로모퉁이', label: 'T자/교차로 모퉁이', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18V6"/><path d="M18 12H6"/><rect x="14" y="14" width="6" height="6"/></svg>`},
+                { value: '큰길T자', label: 'T자형 도로 끝 (정면)', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18V9"/><path d="M18 9H6"/><rect x="10" y="3" width="4" height="6"/></svg>` },
+                { value: '막다른끝', label: '막다른 골목 끝', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13"/><path d="M17 12l-4 4"/><path d="M17 12l-4-4"/><rect x="3" y="3" width="4" height="6"/></svg>` },
             ],
             terrainOptions: ['평지', '비탈', '골짜기', '언덕'],
             balconyExpandedOptions: [
@@ -487,12 +500,15 @@
                 </label>
             `).join('');
             
-            // Alley Position
+            // Alley Position (with icons)
             const alleyContainer = document.getElementById('alley-options');
             alleyContainer.innerHTML = FORM_OPTIONS.alleyOptions.map(opt => `
-                <label class="flex items-center gap-2.5 sm:gap-3 p-3 sm:p-3.5 rounded-md border cursor-pointer transition-colors active:scale-98 bg-slate-900 border-slate-600 hover:border-slate-500">
+                <label class="flex items-center p-3 sm:p-3.5 rounded-md border cursor-pointer transition-colors active:scale-98 bg-slate-900 border-slate-600 hover:border-slate-500">
                     <input type="radio" name="alleyPosition" value="${opt.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
-                    <span class="text-xs sm:text-sm text-slate-200">${opt.label}</span>
+                    <div class="flex items-center ml-2.5">
+                        ${opt.icon}
+                        <span class="text-xs sm:text-sm text-slate-200">${opt.label}</span>
+                    </div>
                 </label>
             `).join('');
             
@@ -770,13 +786,13 @@
             window.Kakao.Share.sendDefault({
                 objectType: 'feed',
                 content: {
-                    title: '우리집 풍수 체커 결과',
+                    title: '우리집 풍수 진단 결과',
                     description: `${result.address}의 풍수 점수는 ${result.totalScore}점! ${result.grade} ${result.emoji}`,
                     imageUrl: 'https://picsum.photos/seed/fengshui/800/400',
                     link: { mobileWebUrl: window.location.href, webUrl: window.location.href },
                 },
                 buttons: [{
-                    title: '우리집도 체크하기',
+                    title: '우리집도 진단하기',
                     link: { mobileWebUrl: window.location.origin, webUrl: window.location.origin },
                 }],
             });
@@ -893,13 +909,14 @@
             if (towers > 0) { score -= 20; negativeItems.push({ title: '송전탑 인근 (高壓線)', description: `200m 내에 ${towers}개의 송전탑이 있어 강한 전자기장의 영향을 받습니다.`, reason: '땅의 기운을 어지럽히고 건강에 해롭습니다. 집안의 기운이 혼란스러워집니다.', score: -20 }); solutions.push({ title: '송전탑 비보책', description: '창가에 수정(크리스탈)을 놓아 나쁜 기운을 정화하고, 숯을 집안 곳곳에 두어 전자파를 흡수하도록 합니다.', reason: '수정은 전자파를 정화하는 효과가 있으며, 숯은 전자파 차단 능력이 뛰어납니다.' }); }
             if (tunnels > 0) { score -= 30; negativeItems.push({ title: '터널 근처 (隧道) - 치명적!', description: `500m 내에 ${tunnels}개의 터널이 있습니다. 산의 혈맥을 자르는 가장 치명적인 흉지입니다.`, reason: '터널은 땅의 혈관을 자르는 것으로, 기운이 터지듯 빠져나갑니다. 주변의 기운까지 쓸려 들어갑니다.', score: -30 }); solutions.push({ title: '터널 근처 유일한 방법', description: '베란다에 수조를 두고 물을 담아 나쁜 기운을 차단하세요. 하지만 근본적 해결은 어렵습니다.', reason: '물은 흐르는 기운을 막아주지만, 터널의 영향은 매우 강력합니다. 장기적으로는 이주를 고려하는 것이 좋습니다.' }); }
             if (hasBalconyBuilding && !hasBalconyMountain) { score -= 15; negativeItems.push({ title: '앞을 가로막는 건물', description: '거실 앞쪽에 건물이 조망을 막고 있습니다.', reason: '"내 인생을 막는 산"이 되어 하는 일이 잘 풀리지 않고 답답함을 느낍니다. 심리적으로도 우울감을 유발합니다.', score: -15 }); solutions.push({ title: '막힌 조망 개선책', description: '거실 창가에 거울을 45도 각도로 배치하여 시야를 확장시키세요.', reason: '거울이 막힌 시야를 확장시키는 착시 효과를 줍니다. 밝은 색상의 커튼과 조명으로 답답함을 해소하세요.' }); }
-            if (hasBalconyRoad) { score -= 15; negativeItems.push({ title: '도로 정면 (路沖殺 가능성)', description: '거실에서 도로가 보입니다. T자형 도로일 가능성이 있습니다.', reason: '도로를 따라 흐르는 기운이 집을 직접 공격하는 형국입니다. 소음, 진동으로 인한 스트레스가 지속됩니다.', score: -15 }); solutions.push({ title: '도로 충살 비보책', description: '베란다에 키 큰 관엽식물(몬스테라, 고무나무)을 3개 이상 배치하세요.', reason: '식물이 돌진하는 기운을 완충시켜줍니다. 식물의 생명력이 나쁜 기운을 정화하고 시각적으로도 도로를 차단합니다.' }); }
+            if (hasBalconyRoad && !(formData.alleyPosition === '큰길T자' || formData.alleyPosition === '교차로모퉁이')) { score -= 15; negativeItems.push({ title: '도로 인접', description: '거실에서 도로가 보입니다. 기운이 안정되기 어렵습니다.', reason: '도로를 따라 흐르는 기운이 집안의 기운을 흔들 수 있습니다. 소음, 진동으로 인한 스트레스가 지속됩니다.', score: -15 }); solutions.push({ title: '도로 소음 비보책', description: '베란다에 키 큰 관엽식물(몬스테라, 고무나무)을 3개 이상 배치하세요.', reason: '식물이 소음과 나쁜 기운을 완충시켜줍니다. 식물의 생명력이 나쁜 기운을 정화하고 시각적으로도 도로를 차단합니다.' }); }
             if (formData.buildingType === '아파트' || formData.buildingType === '오피스텔') { if (floor <= 8) { score += 5; positiveItems.push({ title: '여유로운 단지 배치', description: `${formData.buildingType}이며 적정 층수에 위치해 있습니다.`, reason: '현대 건설사들은 풍수를 고려하여 단지를 배치합니다. 적정 밀도와 층수가 중요합니다.', score: 5 }); } }
             if (formData.sunlightHours === '거의없음') { score -= 15; negativeItems.push({ title: '햇빛 부족', description: '하루 햇빛이 거의 들지 않아 음기가 강합니다.', reason: '햇빛이 부족하면 생기가 상실되고 무기력해집니다. 하루 최소 3시간 이상 햇빛이 필요합니다.', score: -15 }); solutions.push({ title: '햇빛 부족 해결책', description: '밝은 조명을 사용하고, 흰색/노란색 계열 인테리어로 양의 기운을 보충하세요.', reason: '인공 조명으로 어두움을 해소하고, 밝은 색상으로 심리적 밝음을 만들어야 합니다.' }); }
             else if (formData.sunlightHours === '1-2시간') { score -= 5; negativeItems.push({ title: '햇빛 다소 부족', description: '하루 1-2시간만 햇빛이 들어 충분하지 않습니다.', reason: '최소 3시간 이상 햇빛이 들어야 생기가 충만합니다.', score: -5 }); }
             else if (formData.sunlightHours === '3시간이상') { score += 5; positiveItems.push({ title: '충분한 채광', description: '하루 3시간 이상 햇빛이 들어와 생기가 넘칩니다.', reason: '충분한 햇빛은 양의 기운을 가득 채워줍니다.', score: 5 }); }
             if (cemeteries > 0 || hospitals > 0) { score -= 15; negativeItems.push({ title: '음기 강한 시설 인근', description: `주변에 ${cemeteries > 0 ? '묘지' : ''}${cemeteries > 0 && hospitals > 0 ? ', ' : ''}${hospitals > 0 ? '병원' : ''}이 있습니다.`, reason: '음의 기운이 강한 시설이 근처에 있어 집안의 생기가 약해지고 우환이 생길 수 있습니다.', score: -15 }); solutions.push({ title: '음기 차단 비보책', description: '집안을 항상 밝게 유지하고, 붉은색 소품(그림, 쿠션)을 활용하여 양의 기운을 강화하세요. 현관에 소금을 두는 것도 좋습니다.', reason: '밝은 조명과 붉은 색상은 양의 기운을 강화하여 음기를 상쇄시킵니다.' }); }
-            if (hasBalconyRoad && formData.alleyPosition === '큰길T자') { score -= 25; negativeItems.push({ title: 'T자형 도로 끝 (路沖殺)', description: '도로가 집을 정면으로 향해 돌진하는 전형적인 흉지입니다.', reason: '도로의 기운이 집을 강하게 들이받아 사고와 구설수가 따를 수 있습니다. 현대적으로는 소음, 진동, 불빛이 직접 들어와 숙면을 방해합니다.', score: -25 }); solutions.push({ title: 'T자 도로 비보책', description: '현관이나 대문 앞에 팔괘경이나 볼록거울을 걸어 흉한 기운을 반사시키고, 키가 큰 화분을 두어 충돌하는 기운을 완화시키세요.', reason: '거울은 나쁜 기운을 반사하고, 식물은 완충 역할을 합니다.' }); }
+            if (formData.alleyPosition === '큰길T자') { score -= 25; negativeItems.push({ title: 'T자형 도로 끝 (路沖殺)', description: '도로가 집을 정면으로 향해 돌진하는 전형적인 흉지입니다.', reason: '도로의 기운이 집을 강하게 들이받아 사고와 구설수가 따를 수 있습니다. 현대적으로는 소음, 진동, 불빛이 직접 들어와 숙면을 방해합니다.', score: -25 }); solutions.push({ title: 'T자 도로 비보책', description: '현관이나 대문 앞에 팔괘경이나 볼록거울을 걸어 흉한 기운을 반사시키고, 키가 큰 화분을 두어 충돌하는 기운을 완화시키세요.', reason: '거울은 나쁜 기운을 반사하고, 식물은 완충 역할을 합니다.' }); }
+            if (formData.alleyPosition === '교차로모퉁이') { score -= 10; negativeItems.push({ title: '교차로 모퉁이', description: '차가 꺾이는 모퉁이에 위치하여 기운이 불안정합니다.', reason: '차량의 불빛과 소음이 잦고, 기운이 직선으로 흐르지 못하고 꺾이는 지점이라 산만합니다. 안정적으로 재물이 모이기 어렵습니다.', score: -10 }); solutions.push({ title: '모퉁이 비보책', description: '해당 방향 창가에 두꺼운 커튼을 치고, 둥근 잎을 가진 관엽 식물을 두어 날카로운 기운을 완화시키세요.', reason: '커튼은 물리적인 차단 역할을 하며, 둥근 잎 식물은 부드러운 기운으로 산만한 기운을 중화시킵니다.' }); }
             if (formData.alleyPosition === '막다른끝') { score -= 10; negativeItems.push({ title: '막다른 골목 (막창집)', description: '골목 가장 안쪽에 위치한 집입니다.', reason: '기운은 순환해야 생성·성장하는데, 막다른 곳에서는 정체됩니다. 충살(衝殺)이 발생하여 3년 내 폐가 가능성도 있습니다.', score: -10 }); solutions.push({ title: '막다른 골목 비보책', description: '집 앞을 항상 밝고 깨끗하게 유지하고, 현관에 풍경(風磬)을 달아 소리로 정체된 기운을 활성화시키세요.', reason: '소리는 정체된 기운을 흐르게 만들고, 밝은 조명은 막힌 기운을 풀어줍니다.' }); }
             if (hasBalconyBuilding) { score -= 10; negativeItems.push({ title: '건물 모서리 (尖角殺)', description: '주변 건물의 뾰족한 모서리가 보입니다.', reason: '뾰족한 모서리가 향하면 건강을 해치고 마음을 불안하게 만듭니다.', score: -10 }); solutions.push({ title: '건물 모서리 비보책', description: '모서리가 향하는 창문에 작은 거울을 두거나, 관엽식물 화분을 놓아 뾰족한 기운을 막고 분산시키세요.', reason: '식물과 거울이 날카로운 살기를 완화시켜줍니다.' }); }
             if (formData.terrain.includes('비탈')) { score -= 15; negativeItems.push({ title: '비탈진 곳 (해수지)', description: '집이 비탈진 곳에 위치해 있습니다.', reason: '저지대를 등지고 고지대를 바라보면 재물운이 나쁩니다. 빗물이 뒤로 흐르면 재물도 함께 빠져나갑니다.', score: -15 }); solutions.push({ title: '비탈 비보책', description: '집의 뒤편에 담장을 높게 쌓거나 나무를 심어 기운이 빠져나가는 것을 막고, 집안 조명을 밝게 하여 양의 기운을 보충하세요.', reason: '담장과 나무가 기운의 흐름을 막아주고, 밝은 조명이 양의 기운을 강화합니다.' }); }
