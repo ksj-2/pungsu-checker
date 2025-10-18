@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -37,6 +36,28 @@
         /* Style for radio button checkmark */
         input[type="radio"] {
           box-shadow: none;
+        }
+        .alley-option-illustration {
+            background-color: #1e293b; /* slate-800 */
+            border: 1px solid #334155; /* slate-700 */
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            margin-bottom: 0.5rem;
+            width: 100%;
+            height: 80px;
+        }
+        .alley-option-illustration .road {
+            stroke: #64748b; /* slate-500 */
+            stroke-width: 4;
+            fill: none;
+        }
+        .alley-option-illustration .house {
+            fill: #10b981; /* emerald-500 */
+            stroke: #6ee7b7; /* emerald-300 */
+            stroke-width: 2;
+        }
+        input[type="radio"]:checked + .alley-illustration-container .alley-option-illustration {
+            border-color: #10b981; /* emerald-500 */
         }
     </style>
 <link rel="stylesheet" href="/index.css">
@@ -126,7 +147,7 @@
 
             <!-- 입력 폼 섹션 -->
             <section id="form-section">
-                <form id="main-form" class="bg-slate-800/50 p-4 sm:p-6 rounded-lg shadow-lg border border-slate-700 space-y-5">
+                <form id="main-form" class="bg-slate-800/50 p-4 sm:p-6 rounded-lg shadow-lg border border-slate-700 space-y-4 sm:space-y-5">
                     <!-- 주소 -->
                     <div>
                         <label class="block text-xs sm:text-sm font-semibold mb-2 text-slate-300">주소</label>
@@ -142,7 +163,7 @@
                     </div>
 
                     <!-- 층수 & 건물 유형 -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
                             <label class="block text-xs sm:text-sm font-semibold mb-2 text-slate-300">층수</label>
                             <input
@@ -183,32 +204,25 @@
 
                     <!-- 거실 조망 -->
                     <div>
-                        <label class="block text-xs sm:text-sm font-semibold mb-2 text-slate-300">
-                            거실 창문에서 보이는 것 (다중 선택)
-                        </label>
-                        <p class="text-xs text-slate-400 mb-2 sm:mb-3">가장 큰 창문 기준</p>
-
-                        <!-- 풍수 Tip: 왜 거실 기준인가? -->
-                        <div class="mb-3">
-                            <button type="button" onclick="toggleVisibility('fengshui-tip-content', 'fengshui-tip-icon')" class="w-full flex justify-between items-center text-left p-2 rounded-md bg-slate-900/50 hover:bg-slate-700/50 transition-colors">
-                                <span class="text-xs text-yellow-300 flex items-center">
-                                    <i data-lucide="lightbulb" class="w-4 h-4 mr-1.5"></i>
-                                    풍수 Tip: 왜 거실 기준인가요?
-                                </span>
-                                <i id="fengshui-tip-icon" data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform"></i>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-xs sm:text-sm font-semibold text-slate-300">
+                                거실 창문에서 보이는 것 (다중 선택)
+                            </label>
+                            <button type="button" onclick="toggleExpand(this.nextElementSibling)" class="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
+                                <i data-lucide="info" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                                <span>왜 거실 기준인가요?</span>
                             </button>
-                            <div id="fengshui-tip-content" class="hidden mt-2 p-3 bg-slate-900 rounded-md border border-slate-700 text-xs text-slate-400 space-y-3">
-                                <p class="font-semibold text-emerald-400">✅ 거실 베란다 기준!</p>
-                                <ul class="list-disc list-inside space-y-1">
-                                    <li><strong class="font-medium text-slate-300">집의 중심 공간:</strong> 가족의 운이 모이는 곳</li>
-                                    <li><strong class="font-medium text-slate-300">명당(明堂)과 연결:</strong> 거실 앞의 트인 공간이 재물운을 결정</li>
-                                    <li><strong class="font-medium text-slate-300">기운의 주 출입구:</strong> 좋은 기운이 가장 많이 드나드는 통로</li>
-                                </ul>
-                                <p class="font-semibold text-red-400 mt-2">❌ 안방/작은방은 덜 중요</p>
-                                <p>개인의 운에 영향을 주지만, 집 전체의 기운은 거실이 좌우합니다. (단, 안방 창이 압도적으로 크다면 일부 고려)</p>
-                            </div>
                         </div>
-
+                        <div class="hidden p-3 mb-3 bg-slate-700/50 border border-slate-600 rounded-md text-xs text-slate-400 space-y-2">
+                            <p><strong>✅ 거실 베란다 기준!</strong></p>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>거실은 집의 중심이자 가족 모두가 모이는 공간입니다.</li>
+                                <li>풍수에서 거실 조망은 기운이 모이는 '명당(明堂)'과 직결됩니다.</li>
+                                <li>집안으로 가장 많은 기운이 드나드는 곳이 거실 창입니다.</li>
+                            </ul>
+                            <p class="text-slate-500">※ 안방/작은방은 개인에게 영향을 주므로 덜 중요하게 봅니다.</p>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-2 sm:mb-3">가장 큰 창문 기준</p>
                         <div id="balcony-view-options" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                              <!-- JS will populate this -->
                         </div>
@@ -224,13 +238,13 @@
                         </div>
                     </div>
 
-                    <!-- 집의 위치 (최종 개선된 버전) -->
+                    <!-- 집의 위치 (최종 개선 버전) -->
                     <div>
                         <label class="block text-xs sm:text-sm font-semibold mb-2 text-slate-300">
                             집의 위치
                         </label>
-                        <div id="alley-options" class="space-y-3">
-                            <!-- JS will populate this with ILLUSTRATIONS -->
+                        <div id="alley-options-visual" class="space-y-2">
+                            <!-- JS will populate this with visual illustrations -->
                         </div>
                     </div>
 
@@ -249,7 +263,7 @@
                         <label class="block text-xs sm:text-sm font-semibold mb-2 text-slate-300">
                             베란다 확장 여부
                         </label>
-                        <div id="balcony-expanded-options" class="grid grid-cols-2 gap-4">
+                        <div id="balcony-expanded-options" class="grid grid-cols-2 gap-2 sm:gap-4">
                             <!-- JS will populate this -->
                         </div>
                     </div>
@@ -259,7 +273,7 @@
                         onclick="handleAnalyze()"
                         class="w-full py-4 sm:py-4.5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold rounded-md hover:opacity-90 active:scale-98 transition-all text-base sm:text-lg shadow-lg"
                     >
-                        풍수 진단 시작
+                        풍수 감정 시작
                     </button>
 
                     <p id="error-message" class="hidden text-red-400 text-center text-sm sm:text-base"></p>
@@ -466,7 +480,7 @@
             buildingTypeSelect: document.getElementById('building-type-select'),
         };
 
-        // --- FORM OPTIONS (with ILLUSTRATIONS) ---
+        // --- FORM OPTIONS (VISUAL UPDATE) ---
         const FORM_OPTIONS = {
             directions: [
                 { value: '남향', label: '남향 (낮 12-2시에 해가 정면)' },
@@ -482,37 +496,16 @@
                 { value: '3시간이상', label: '3시간 이상 (이상적!)' }
             ],
             alleyOptions: [
-                { 
-                    value: '큰길가', 
-                    label: '큰 길가', 
-                    illustration: `<svg viewBox="0 0 100 60" class="w-full h-auto text-slate-400"><path d="M0 20 H100" stroke="currentColor" stroke-width="2" stroke-dasharray="4 2"/><rect x="40" y="30" width="20" height="20" class="text-emerald-400" fill="currentColor" stroke="#1e293b" stroke-width="2"/></svg>` 
-                },
-                { 
-                    value: '골목중간', 
-                    label: '골목 중간', 
-                    illustration: `<svg viewBox="0 0 100 60" class="w-full h-auto text-slate-400"><path d="M0 20 H100" stroke="currentColor" stroke-width="2" stroke-dasharray="4 2"/><rect x="10" y="30" width="20" height="20" stroke="currentColor" fill="#334155"/><rect x="40" y="30" width="20" height="20" class="text-emerald-400" fill="currentColor" stroke="#1e293b" stroke-width="2"/><rect x="70" y="30" width="20" height="20" stroke="currentColor" fill="#334155"/></svg>` 
-                },
-                { 
-                    value: '교차로모퉁이', 
-                    label: 'T자/교차로 모퉁이', 
-                    illustration: `<svg viewBox="0 0 100 60" class="w-full h-auto text-slate-400"><path d="M0 30 H50 V0 M50 30 V60" stroke="currentColor" stroke-width="2" stroke-dasharray="4 2"/><rect x="55" y="35" width="20" height="20" class="text-emerald-400" fill="currentColor" stroke="#1e293b" stroke-width="2"/></svg>`
-                },
-                { 
-                    value: '큰길T자', 
-                    label: 'T자형 도로 끝 (정면)', 
-                    illustration: `<svg viewBox="0 0 100 60" class="w-full h-auto text-slate-400"><path d="M0 50 H100 M50 50 V0" stroke="currentColor" stroke-width="2" stroke-dasharray="4 2"/><rect x="40" y="5" width="20" height="20" class="text-red-400" fill="currentColor" stroke="#1e293b" stroke-width="2"/></svg>` 
-                },
-                { 
-                    value: '막다른끝', 
-                    label: '막다른 골목 끝', 
-                    illustration: `<svg viewBox="0 0 100 60" class="w-full h-auto text-slate-400"><path d="M0 20 H80 V40 H0 Z" fill="#334155"/><path d="M0 25 H70 M0 35 H70" stroke="currentColor" stroke-width="1" stroke-dasharray="3 2"/><rect x="10" y="2" width="20" height="20" class="text-emerald-400" fill="currentColor" stroke="#1e293b" stroke-width="2"/></svg>` 
-                },
+                { value: '큰길가', label: '큰 길가', illustration: '<svg viewBox="0 0 100 50"><path class="road" d="M 0 25 H 100"/><rect class="house" x="40" y="35" width="20" height="15"/></svg>' },
+                { value: '골목중간', label: '골목 중간', illustration: '<svg viewBox="0 0 100 50"><path class="road" d="M 0 25 H 100"/><rect class="house" x="40" y="5" width="20" height="15"/></svg>' },
+                { value: '교차로모퉁이', label: 'T자/교차로 모퉁이', illustration: '<svg viewBox="0 0 100 50"><path class="road" d="M 50 0 V 50 M 0 25 H 100"/><rect class="house" x="60" y="30" width="20" height="15"/></svg>'},
+                { value: '큰길T자', label: 'T자형 도로 끝 (정면)', illustration: '<svg viewBox="0 0 100 50"><path class="road" d="M 0 40 H 100 M 50 40 V 15"/><rect class="house" x="40" y="0" width="20" height="15"/></svg>'},
+                { value: 'y자형도로', label: 'Y자형 도로 (가위 살)', illustration: '<svg viewBox="0 0 100 50"><path class="road" d="M 50 50 V 25 L 10 0 M 50 25 L 90 0"/><rect class="house" x="40" y="15" width="20" height="15"/></svg>'},
+                { value: '반궁살', label: '굽은 도로 바깥쪽 (반궁 살)', illustration: '<svg viewBox="0 0 100 50"><path class="road" d="M 0 50 C 50 -10, 50 -10, 100 50"/><rect class="house" x="40" y="5" width="20" height="15"/></svg>'},
+                { value: '막다른끝', label: '막다른 골목 끝', illustration: '<svg viewBox="0 0 100 50"><path class="road" d="M 0 25 H 80"/><rect class="house" x="80" y="17.5" width="20" height="15"/></svg>'},
             ],
             terrainOptions: ['평지', '비탈', '골짜기', '언덕'],
-            balconyExpandedOptions: [
-                { value: '예' },
-                { value: '아니오' }
-            ]
+            balconyExpandedOptions: [ { value: '예' }, { value: '아니오' } ]
         };
 
         // --- UI RENDERING FUNCTIONS ---
@@ -543,16 +536,14 @@
                 </label>
             `).join('');
             
-            // Alley Position (with ILLUSTRATIONS)
-            const alleyContainer = document.getElementById('alley-options');
+            // Alley Position (Visual Illustrations)
+            const alleyContainer = document.getElementById('alley-options-visual');
             alleyContainer.innerHTML = FORM_OPTIONS.alleyOptions.map(opt => `
-                <label class="flex flex-col p-3 rounded-md border cursor-pointer transition-colors active:scale-98 bg-slate-900 border-slate-700 hover:border-slate-500">
-                    <div class="flex items-center w-full">
-                        <input type="radio" name="alleyPosition" value="${opt.value}" onchange="updateFormState()" class="w-5 h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
-                        <span class="ml-3 text-sm font-medium text-slate-200">${opt.label}</span>
-                    </div>
-                    <div class="mt-3 p-3 bg-slate-800 rounded-md">
-                        ${opt.illustration}
+                <label class="flex items-center p-3 rounded-md border cursor-pointer transition-colors active:scale-98 bg-slate-900 border-slate-600 hover:border-slate-500">
+                    <input type="radio" name="alleyPosition" value="${opt.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
+                    <div class="ml-4 w-full alley-illustration-container">
+                        <div class="alley-option-illustration">${opt.illustration}</div>
+                        <span class="text-xs sm:text-sm text-slate-200">${opt.label}</span>
                     </div>
                 </label>
             `).join('');
@@ -727,10 +718,10 @@
                 if (label) {
                     if (radio.checked) {
                         label.classList.add('bg-emerald-900/30', 'border-emerald-500');
-                        label.classList.remove('bg-slate-900', 'border-slate-700', 'hover:border-slate-500');
+                        label.classList.remove('bg-slate-900', 'border-slate-600', 'hover:border-slate-500');
                     } else {
                         label.classList.remove('bg-emerald-900/30', 'border-emerald-500');
-                        label.classList.add('bg-slate-900', 'border-slate-700', 'hover:border-slate-500');
+                        label.classList.add('bg-slate-900', 'border-slate-600', 'hover:border-slate-500');
                     }
                 }
             });
@@ -753,29 +744,10 @@
             appState.showDirectionGuide = show;
             DOMElements.directionGuideModal.classList.toggle('hidden', !show);
         }
-        
-        function toggleVisibility(contentId, iconId) {
-            const content = document.getElementById(contentId);
-            const icon = document.getElementById(iconId);
-            const isHidden = content.classList.contains('hidden');
 
-            content.classList.toggle('hidden');
-            if (icon) {
-                icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-            }
-        }
-
-        function toggleExpand(buttonElement) {
-            const content = buttonElement.nextElementSibling;
-            const icon = buttonElement.querySelector('[data-lucide^="chevron"]');
-            const isHidden = content.classList.contains('hidden');
-
-            content.classList.toggle('hidden');
-            if (isHidden) {
-                icon.style.transform = 'rotate(180deg)';
-            } else {
-                icon.style.transform = 'rotate(0deg)';
-            }
+        function toggleExpand(element) {
+            const isHidden = element.classList.contains('hidden');
+            element.classList.toggle('hidden');
         }
 
         async function handleAnalyze() {
@@ -825,7 +797,7 @@
                  const label = radio.closest('label');
                  if(label) {
                     label.classList.remove('bg-emerald-900/30', 'border-emerald-500');
-                    label.classList.add('bg-slate-900', 'border-slate-700', 'hover:border-slate-500');
+                    label.classList.add('bg-slate-900', 'border-slate-600', 'hover:border-slate-500');
                  }
             });
             renderApp();
@@ -884,13 +856,7 @@
         async function realAnalyzeFengShui(formData, setLoadingStep) {
             const sleep = ms => new Promise(r => setTimeout(r, ms));
             
-            // =========================================================================
-            //  ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
-            //  이곳에 Vercel에서 복사한 '심부름꾼' 주소를 붙여넣어 주세요!
-            //  =========================================================================
             const VERCEL_PROXY_URL = 'https://pungsu-backend.vercel.app';
-            //  ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
-            // =========================================================================
 
             if (VERCEL_PROXY_URL === '여기에_복사한_Vercel_주소를_붙여넣으세요') {
                 throw new Error('Vercel 프록시 주소가 설정되지 않았습니다. index.html 파일을 수정해주세요.');
@@ -972,6 +938,8 @@
             else if (formData.sunlightHours === '3시간이상') { score += 5; positiveItems.push({ title: '충분한 채광', description: '하루 3시간 이상 햇빛이 들어와 생기가 넘칩니다.', reason: '충분한 햇빛은 양의 기운을 가득 채워줍니다.', score: 5 }); }
             if (cemeteries > 0 || hospitals > 0) { score -= 15; negativeItems.push({ title: '음기 강한 시설 인근', description: `주변에 ${cemeteries > 0 ? '묘지' : ''}${cemeteries > 0 && hospitals > 0 ? ', ' : ''}${hospitals > 0 ? '병원' : ''}이 있습니다.`, reason: '음의 기운이 강한 시설이 근처에 있어 집안의 생기가 약해지고 우환이 생길 수 있습니다.', score: -15 }); solutions.push({ title: '음기 차단 비보책', description: '집안을 항상 밝게 유지하고, 붉은색 소품(그림, 쿠션)을 활용하여 양의 기운을 강화하세요. 현관에 소금을 두는 것도 좋습니다.', reason: '밝은 조명과 붉은 색상은 양의 기운을 강화하여 음기를 상쇄시킵니다.' }); }
             if (formData.alleyPosition === '큰길T자') { score -= 25; negativeItems.push({ title: 'T자형 도로 끝 (路沖殺)', description: '도로가 집을 정면으로 향해 돌진하는 전형적인 흉지입니다.', reason: '도로의 기운이 집을 강하게 들이받아 사고와 구설수가 따를 수 있습니다. 현대적으로는 소음, 진동, 불빛이 직접 들어와 숙면을 방해합니다.', score: -25 }); solutions.push({ title: 'T자 도로 비보책', description: '현관이나 대문 앞에 팔괘경이나 볼록거울을 걸어 흉한 기운을 반사시키고, 키가 큰 화분을 두어 충돌하는 기운을 완화시키세요.', reason: '거울은 나쁜 기운을 반사하고, 식물은 완충 역할을 합니다.' }); }
+            if (formData.alleyPosition === 'y자형도로') { score -= 20; negativeItems.push({ title: 'Y자형 도로 (剪刀煞)', description: '갈라지는 도로 사이에 위치하여 기운이 불안정합니다.', reason: '도로가 갈라지는 가위의 날 중앙에 위치한 형상입니다. 기운이 충돌하고 흩어져 재물이 모이지 않고 가족간의 불화가 잦을 수 있습니다.', score: -20 }); solutions.push({ title: 'Y자 도로 비보책', description: '기운이 충돌하는 지점(집 앞)에 둥근 모양의 화단이나 수경 시설을 두어 기운의 흐름을 부드럽게 만드세요.', reason: '물과 둥근 형태는 날카로운 기운을 완화시키고 부드럽게 순환시키는 역할을 합니다.' }); }
+            if (formData.alleyPosition === '반궁살') { score -= 20; negativeItems.push({ title: '굽은 도로 바깥쪽 (反弓煞)', description: '활처럼 굽은 도로의 바깥쪽에 위치한 흉지입니다.', reason: '도로를 달리는 차들의 원심력이 만들어내는 살기(煞氣)가 계속해서 집을 때리는 형상입니다. 재물이 흩어지고 건강을 해칠 수 있습니다.', score: -20 }); solutions.push({ title: '반궁살 비보책', description: '도로 방향으로 담장을 쌓거나 나무를 심어 보호막을 만들고, 현관에 붉은색 매트를 두어 나쁜 기운을 막으세요.', reason: '물리적인 보호막으로 살기를 막고, 붉은색의 강한 양기로 음의 기운을 차단합니다.' }); }
             if (formData.alleyPosition === '교차로모퉁이') { score -= 10; negativeItems.push({ title: '교차로 모퉁이', description: '차가 꺾이는 모퉁이에 위치하여 기운이 불안정합니다.', reason: '차량의 불빛과 소음이 잦고, 기운이 직선으로 흐르지 못하고 꺾이는 지점이라 산만합니다. 안정적으로 재물이 모이기 어렵습니다.', score: -10 }); solutions.push({ title: '모퉁이 비보책', description: '해당 방향 창가에 두꺼운 커튼을 치고, 둥근 잎을 가진 관엽 식물을 두어 날카로운 기운을 완화시키세요.', reason: '커튼은 물리적인 차단 역할을 하며, 둥근 잎 식물은 부드러운 기운으로 산만한 기운을 중화시킵니다.' }); }
             if (formData.alleyPosition === '막다른끝') { score -= 10; negativeItems.push({ title: '막다른 골목 (막창집)', description: '골목 가장 안쪽에 위치한 집입니다.', reason: '기운은 순환해야 생성·성장하는데, 막다른 곳에서는 정체됩니다. 충살(衝殺)이 발생하여 3년 내 폐가 가능성도 있습니다.', score: -10 }); solutions.push({ title: '막다른 골목 비보책', description: '집 앞을 항상 밝고 깨끗하게 유지하고, 현관에 풍경(風磬)을 달아 소리로 정체된 기운을 활성화시키세요.', reason: '소리는 정체된 기운을 흐르게 만들고, 밝은 조명은 막힌 기운을 풀어줍니다.' }); }
             if (hasBalconyBuilding) { score -= 10; negativeItems.push({ title: '건물 모서리 (尖角殺)', description: '주변 건물의 뾰족한 모서리가 보입니다.', reason: '뾰족한 모서리가 향하면 건강을 해치고 마음을 불안하게 만듭니다.', score: -10 }); solutions.push({ title: '건물 모서리 비보책', description: '모서리가 향하는 창문에 작은 거울을 두거나, 관엽식물 화분을 놓아 뾰족한 기운을 막고 분산시키세요.', reason: '식물과 거울이 날카로운 살기를 완화시켜줍니다.' }); }
@@ -1017,7 +985,6 @@
             lucide.createIcons();
         });
     </script>
-
 <script type="module" src="/index.tsx"></script>
 </body>
 </html>
