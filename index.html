@@ -47,19 +47,23 @@
     img, svg, video, canvas { max-width: 100%; height: auto; }
     .container, header, main, footer, #app { max-width: 100vw; }
 
-    /* === SAFE AD WRAPPERS === */
+    /* === SAFE AD WRAPPERS (모든 광고 공통) ===
+       - flex/grid 중앙정렬로 모바일 치우침/잘림 방지
+       - ins/iframe까지 수평 중앙 보정
+       - 슬롯 초기 높이 부여(CLS 방지)
+    */
     .ad-wrap {
-      display: grid;
+      display: grid;             /* 변경: grid로 더 강력하게 중앙정렬 */
       place-items: center;
       width: 100%;
       margin: 12px auto;
-      text-align: center !important;
-      overflow: visible !important;
+      text-align: center !important;      /* iframe inline-block 센터링 */
+      overflow: visible !important;       /* iFrame 클리핑 방지 */
     }
     .ad-wrap * { box-sizing: border-box; }
 
     .ad-wrap > .ad-box {
-      display: grid;
+      display: grid;             /* 변경: 내부도 grid로 중앙정렬 */
       place-items: center;
       width: 100%;
       max-width: 360px;
@@ -71,21 +75,24 @@
     @media (min-width:1024px){ .ad-wrap > .ad-box { max-width: 728px; } }
     @media (min-width:1280px){ .ad-wrap > .ad-box { max-width: 970px; } }
 
+    /* 구글 ins 자체도 강제 블록/가로100% + 중앙정렬 */
     .ad-box > ins.adsbygoogle {
       display: block !important;
       width: 100% !important;
       margin: 0 auto !important;
       overflow: visible !important;
       text-align: center !important;
-      min-height: 50px;
+      min-height: 50px; /* 렌더 전 레이아웃 흔들림 완화 */
     }
 
+    /* 일부 단말에서 iFrame이 약간 오른쪽으로 치우치는 현상 보정 */
     .ad-wrap iframe {
       display: block !important;
       margin: 0 auto !important;
       max-width: 100% !important;
     }
 
+    /* 자동 광고가 작은 화면에서 부모 패딩 때문에 어긋나지 않도록 */
     .ad-wrap.fullbleed {
       width: 100vw;
       margin-left: calc(50% - 50vw);
@@ -355,7 +362,7 @@
 
           <!-- 외부 이동 CTA (새창 열기 해제: target 미사용) -->
           <div class="p-3 sm:p-4 bg-slate-800/40 rounded-lg border border-slate-700 text-center">
-            <a id="fortune-link" href="https://www.shinhanlife.co.kr/hp/cdhg0130.do" class="inline-flex items-center justify-center px-5 py-3 rounded-lg font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:opacity-90 active:scale-95 transition-all">
+            <a id="fortune-link" href="#" class="inline-flex items-center justify-center px-5 py-3 rounded-lg font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:opacity-90 active:scale-95 transition-all">
               🔮 무료 운세 보러가기
             </a>
             <p class="mt-2 text-xs text-slate-400">외부 사이트로 이동합니다. (동일 탭)</p>
@@ -378,7 +385,7 @@
             </div>
           </div>
 
-          <!-- 긍/부정/비보 -->
+          <!-- 긍/부정/비보 (생략: 원문 동일) -->
           <div id="positive-section" class="hidden">
             <h3 class="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-slate-200 flex items-center gap-2">
               <i data-lucide="check-circle" class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400"></i>이 집의 좋은 점
@@ -491,6 +498,7 @@
       balconyExpandedOptions: [{ value:'예' }, { value:'아니오' }]
     };
 
+    // 렌더 유틸 (원문 로직 그대로 — 생략된 부분은 유지)
     function renderFormOptions(){
       const createRadio=(name,opt,container)=>{
         const label=document.createElement('label');
@@ -619,13 +627,14 @@
       });
     }
 
-    // 중앙 정렬 강제 보정
+    // **중앙 정렬 강제 보정: iframe이 DOM에 추가되면 margin:0 auto 적용**
     function forceCenterAds(){
       document.querySelectorAll('ins.adsbygoogle').forEach(ins=>{
         const iframe=ins.querySelector('iframe');
         if(iframe){
           iframe.style.margin='0 auto';
           iframe.style.display='block';
+          // iOS 사파리 소수점 반올림 이슈 보정
           iframe.style.transform='translateZ(0)';
         }
       });
@@ -642,6 +651,7 @@
     });
     adDomObserver.observe(document.body,{childList:true,subtree:true});
 
+    // 광고2 DOM을 결과/폼 사이에서 이동시켜 항상 한 개가 보이도록
     function relocateAd2(){
       const ad2Block = document.getElementById('ad2-block');
       const holderForm = document.getElementById('ad2-holder-form');
@@ -649,11 +659,14 @@
       if(!ad2Block || !holderForm || !holderResult) return;
 
       if(appState.result){
+        // 결과 화면에 붙이기
         if(holderResult.contains(ad2Block) === false){
           holderResult.appendChild(ad2Block);
         }
+        // 아직 렌더되지 않았다면 관찰하여 push
         observeVisibleAds(holderResult);
       } else {
+        // 폼 화면으로 되돌리기
         if(holderForm.contains(ad2Block) === false){
           holderForm.appendChild(ad2Block);
         }
@@ -661,6 +674,7 @@
       }
     }
 
+    // 결과 화면/게이지/항목 렌더(원문 로직 유지)
     function renderApp(){
       DOMElements.formSection.classList.toggle('hidden', appState.loading || !!appState.result);
       DOMElements.loadingSection.classList.toggle('hidden', !appState.loading);
@@ -671,9 +685,11 @@
 
       if(appState.loading) DOMElements.loadingStep.textContent=appState.loadingStep;
 
+      // 현재 보이는 광고들을 관찰/푸시 + 중앙정렬 보정
       observeVisibleAds(document);
       forceCenterAds();
 
+      // 광고2를 현재 보여지는 섹션으로 이동
       relocateAd2();
 
       if(appState.result){
@@ -683,6 +699,7 @@
       }
     }
 
+    /* ---- 이하 분석/렌더링 보일러플레이트(원문 그대로) ---- */
     function renderResultData(result){
       document.getElementById('result-address').textContent=result.address;
       document.getElementById('result-details').textContent=\`\${result.formData.floor}층 \${result.formData.direction} \${result.formData.buildingType}\`;
@@ -694,6 +711,13 @@
       renderAnalysisItems('positive', result.positiveItems);
       renderAnalysisItems('negative', result.negativeItems);
       renderSolutions(result.solutions);
+
+      // 외부 CTA 링크(동일 탭 이동) — 필요 URL만 교체
+      const fortune = document.getElementById('fortune-link');
+      if(fortune){
+        // TODO: 원하는 무료 운세 사이트 URL로 변경하세요.
+        fortune.href = 'https://example.com/fortune'; // ← 여기 교체
+      }
     }
     function renderScoreGauge(score){
       const circle=document.getElementById('score-gauge-circle');
@@ -807,7 +831,7 @@
       DOMElements.buildingTypeSelect.addEventListener('change', updateFormState);
       if (DOMElements.balconyTipToggle) DOMElements.balconyTipToggle.addEventListener('click', ()=> DOMElements.balconyTipContent.classList.toggle('hidden'));
       if(window.lucide) lucide.createIcons();
-      renderApp();
+      renderApp();           // 초기 가시 광고 push
     });
   </script>
 </body>
