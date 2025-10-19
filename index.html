@@ -53,12 +53,19 @@
     @media (min-width:640px){ .ad-wrap > .ad-box { max-width: 600px; } }
     @media (min-width:1024px){ .ad-wrap > .ad-box { max-width: 728px; } }
     @media (min-width:1280px){ .ad-wrap > .ad-box { max-width: 970px; } }
+
     /* 구글 ins 자체도 강제 블록/가로100% */
     .ad-box > ins.adsbygoogle {
       display: block !important;
       width: 100% !important;
       margin: 0 auto !important;
       overflow: visible !important;
+    }
+    /* 일부 단말에서 iFrame이 약간 오른쪽으로 치우치는 현상 보정 */
+    .ad-wrap iframe {
+      display: block !important;
+      margin: 0 auto !important;
+      max-width: 100% !important;
     }
   </style>
 
@@ -237,9 +244,9 @@
           <p id="error-message" class="hidden text-red-400 text-center text-sm sm:text-base"></p>
         </form>
 
-        <!-- [광고 2] 폼 아래 (고유 슬롯) -->
-        <div class="mt-6 sm:mt-8 p-4 sm:p-6 bg-slate-800/30 rounded-lg text-center text-xs sm:text-sm text-slate-500 border border-slate-700">
-          <div class="ad-wrap">
+        <!-- [광고 2] 폼 아래 (고유 슬롯) — 결과 화면으로 이동/복귀가 가능한 단일 DOM 노드 -->
+        <div id="ad2-holder-form" class="mt-6 sm:mt-8 p-4 sm:p-6 bg-slate-800/30 rounded-lg text-center text-xs sm:text-sm text-slate-500 border border-slate-700">
+          <div id="ad2-block" class="ad-wrap">
             <div class="ad-box">
               <ins class="adsbygoogle"
                    style="display:block"
@@ -320,16 +327,19 @@
             </div>
           </div>
 
-          <!-- [광고 3] 결과 중간 (★ 반드시 '새 슬롯ID'로 교체하세요) -->
+          <!-- [광고 2] 결과 화면 위치로도 사용할 자리(동일 DOM 이동) -->
+          <div id="ad2-holder-result" class="p-3 sm:p-4 bg-slate-800/30 rounded-lg text-center text-xs sm:text-sm text-slate-500 border border-slate-700"></div>
+
+          <!-- [광고 3] 결과 중간 (새 슬롯 사용) -->
           <div class="p-3 sm:p-4 bg-slate-800/30 rounded-lg text-center text-xs sm:text-sm text-slate-500 border border-slate-700">
             <div class="ad-wrap">
               <div class="ad-box">
                 <ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-1819982598567420"
-     data-ad-slot="4464482511"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
+                     style="display:block"
+                     data-ad-client="ca-pub-1819982598567420"
+                     data-ad-slot="4464482511"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
               </div>
             </div>
           </div>
@@ -576,7 +586,30 @@
       });
     }
 
-    // 결과 화면/게이지/항목 렌더(원문 로직 유지) —— 생략된 부분은 동일
+    // 광고2 DOM을 결과/폼 사이에서 이동시켜 항상 한 개가 보이도록
+    function relocateAd2(){
+      const ad2Block = document.getElementById('ad2-block');
+      const holderForm = document.getElementById('ad2-holder-form');
+      const holderResult = document.getElementById('ad2-holder-result');
+      if(!ad2Block || !holderForm || !holderResult) return;
+
+      if(appState.result){
+        // 결과 화면에 붙이기
+        if(holderResult.contains(ad2Block) === false){
+          holderResult.appendChild(ad2Block);
+        }
+        // 아직 렌더되지 않았다면 관찰하여 push
+        observeVisibleAds(holderResult);
+      } else {
+        // 폼 화면으로 되돌리기
+        if(holderForm.contains(ad2Block) === false){
+          holderForm.appendChild(ad2Block);
+        }
+        observeVisibleAds(holderForm);
+      }
+    }
+
+    // 결과 화면/게이지/항목 렌더(원문 로직 유지)
     function renderApp(){
       DOMElements.formSection.classList.toggle('hidden', appState.loading || !!appState.result);
       DOMElements.loadingSection.classList.toggle('hidden', !appState.loading);
@@ -589,6 +622,9 @@
 
       // 현재 보이는 광고들을 관찰/푸시
       observeVisibleAds(document);
+
+      // 광고2를 현재 보여지는 섹션으로 이동
+      relocateAd2();
 
       if(appState.result){
         renderResultData(appState.result);
@@ -624,8 +660,8 @@
       const container=document.getElementById(containerId), section=document.getElementById(sectionId);
       if(items.length===0){ section.classList.add('hidden'); return; } section.classList.remove('hidden');
       const isPositive=type==='positive', color=isPositive?'emerald':'red', icon=isPositive?'arrow-up':'arrow-down';
-      container.innerHTML = items.map(item=>`
-        <div class="bg-slate-800/50 p-3 sm:p-4 rounded-lg border border-${color}-900/30">
+      container.innerHTML = items.map(item=>
+        `<div class="bg-slate-800/50 p-3 sm:p-4 rounded-lg border border-${color}-900/30">
           <button onclick="toggleExpand(this)" class="w-full flex items-start gap-3 sm:gap-4">
             <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-${color}-900/50 text-${color}-400">
               <i data-lucide="${icon}" class="sm:w-6 sm:h-6" style="width:18px;height:18px;"></i>
@@ -649,8 +685,8 @@
       const container=document.getElementById('solutions-container'), section=document.getElementById('solutions-section');
       if(solutions.length===0){ section.classList.add('hidden'); return; }
       section.classList.remove('hidden');
-      container.innerHTML = solutions.map(sol=>`
-        <div class="bg-yellow-900/20 p-3 sm:p-4 rounded-lg border border-yellow-400/30">
+      container.innerHTML = solutions.map(sol=>
+        `<div class="bg-yellow-900/20 p-3 sm:p-4 rounded-lg border border-yellow-400/30">
           <div class="flex items-start gap-3 sm:gap-4">
             <i data-lucide="lightbulb" class="w-8 h-8 sm:w-10 sm:h-10 text-yellow-400 flex-shrink-0"></i>
             <div>
@@ -705,7 +741,6 @@
       else if(formData.direction==='북향'){ score-=10; negativeItems.push({title:'북향 - 햇빛 부족',description:'햇빛이 거의 들지 않아 음습할 수 있습니다.',reason:'햇빛 부족은 생기를 약화시킵니다.',score:-10});}
       if(towers>0){ score-=20; negativeItems.push({title:'송전탑 인근 (高壓線)',description:`200m 내에 ${towers}개의 송전탑이 있습니다.`,reason:'강한 전자기장은 땅의 기운을 어지럽힙니다.',score:-20});}
       if(tunnels>0){ score-=30; negativeItems.push({title:'터널 근처 (隧道)',description:`500m 내에 ${tunnels}개의 터널이 있습니다.`,reason:'터널은 땅의 혈관을 끊는 형상입니다.',score:-30});}
-      const hasBalconyBuilding=formData.balconyView.includes('건물');
       if(hasBalconyBuilding && !hasBalconyMountain){ score-=15; negativeItems.push({title:'앞을 가로막는 건물',description:'거실 앞 건물이 조망을 막습니다.',reason:'막힌 조망은 흐름을 답답하게 합니다.',score:-15});}
       if(formData.sunlightHours==='거의없음'){ score-=15; negativeItems.push({title:'햇빛 부족',description:'하루 햇빛이 거의 들지 않습니다.',reason:'최소 3시간 이상 채광이 이상적입니다.',score:-15});}
       else if(formData.sunlightHours==='1-2시간'){ score-=5; negativeItems.push({title:'햇빛 다소 부족',description:'1~2시간은 충분하지 않습니다.',reason:'3시간 이상이 권장됩니다.',score:-5});}
