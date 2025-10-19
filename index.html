@@ -16,23 +16,6 @@
   <meta property="og:url" content="https://ksj-2.github.io/pungsu-checker/">
   <meta property="og:type" content="website">
 
-  <!-- Twitter Card (추가) -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="우리집 풍수 진단 | 무료 풍수지리, 집터, 명당, 이사방향 전문가 분석">
-  <meta name="twitter:description" content="AI 셀프 풍수 진단으로 우리집 집터, 명당, 이사방향을 무료 분석.">
-  <meta name="twitter:image" content="https://picsum.photos/seed/fengshui_og/1200/630">
-
-  <!-- UX: PWA/브라우저 색상 -->
-  <meta name="theme-color" content="#0f172a">
-
-  <!-- Preconnects (광고/이미지/CDN 성능 보조) -->
-  <link rel="preconnect" href="https://pagead2.googlesyndication.com">
-  <link rel="preconnect" href="https://tpc.googlesyndication.com">
-  <link rel="preconnect" href="https://googleads.g.doubleclick.net">
-  <link rel="preconnect" href="https://developers.kakao.com">
-  <link rel="preconnect" href="https://unpkg.com">
-  <link rel="preconnect" href="https://picsum.photos">
-
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -48,57 +31,41 @@
     .container, header, main, footer, #app { max-width: 100vw; }
 
     /* === SAFE AD WRAPPERS (모든 광고 공통) ===
-       - flex/grid 중앙정렬로 모바일 치우침/잘림 방지
-       - ins/iframe까지 수평 중앙 보정
-       - 슬롯 초기 높이 부여(CLS 방지)
+       - flex 중앙정렬로 모바일 치우침/잘림 방지
+       - 부모/자식 overflow 강제 해제
     */
     .ad-wrap {
-      display: grid;             /* 변경: grid로 더 강력하게 중앙정렬 */
-      place-items: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       width: 100%;
       margin: 12px auto;
-      text-align: center !important;      /* iframe inline-block 센터링 */
-      overflow: visible !important;       /* iFrame 클리핑 방지 */
+      text-align: center;           /* 보조 정렬 */
+      overflow: visible !important; /* iFrame 클리핑 방지 */
     }
-    .ad-wrap * { box-sizing: border-box; }
-
     .ad-wrap > .ad-box {
-      display: grid;             /* 변경: 내부도 grid로 중앙정렬 */
-      place-items: center;
+      display: block;
       width: 100%;
       max-width: 360px;
       margin: 0 auto;
       overflow: visible !important;
-      text-align: center !important;
     }
     @media (min-width:640px){ .ad-wrap > .ad-box { max-width: 600px; } }
     @media (min-width:1024px){ .ad-wrap > .ad-box { max-width: 728px; } }
     @media (min-width:1280px){ .ad-wrap > .ad-box { max-width: 970px; } }
 
-    /* 구글 ins 자체도 강제 블록/가로100% + 중앙정렬 */
+    /* 구글 ins 자체도 강제 블록/가로100% */
     .ad-box > ins.adsbygoogle {
       display: block !important;
       width: 100% !important;
       margin: 0 auto !important;
       overflow: visible !important;
-      text-align: center !important;
-      min-height: 50px; /* 렌더 전 레이아웃 흔들림 완화 */
     }
-
     /* 일부 단말에서 iFrame이 약간 오른쪽으로 치우치는 현상 보정 */
     .ad-wrap iframe {
       display: block !important;
       margin: 0 auto !important;
       max-width: 100% !important;
-    }
-
-    /* 자동 광고가 작은 화면에서 부모 패딩 때문에 어긋나지 않도록 */
-    .ad-wrap.fullbleed {
-      width: 100vw;
-      margin-left: calc(50% - 50vw);
-      margin-right: calc(50% - 50vw);
-      padding-left: 12px;
-      padding-right: 12px;
     }
   </style>
 
@@ -360,14 +327,6 @@
             </div>
           </div>
 
-          <!-- 외부 이동 CTA (새창 열기 해제: target 미사용) -->
-          <div class="p-3 sm:p-4 bg-slate-800/40 rounded-lg border border-slate-700 text-center">
-            <a id="fortune-link" href="#" class="inline-flex items-center justify-center px-5 py-3 rounded-lg font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:opacity-90 active:scale-95 transition-all">
-              🔮 무료 운세 보러가기
-            </a>
-            <p class="mt-2 text-xs text-slate-400">외부 사이트로 이동합니다. (동일 탭)</p>
-          </div>
-
           <!-- [광고 2] 결과 화면 위치로도 사용할 자리(동일 DOM 이동) -->
           <div id="ad2-holder-result" class="p-3 sm:p-4 bg-slate-800/30 rounded-lg text-center text-xs sm:text-sm text-slate-500 border border-slate-700"></div>
 
@@ -503,23 +462,23 @@
       const createRadio=(name,opt,container)=>{
         const label=document.createElement('label');
         label.className='flex items-center gap-3 p-3 rounded-md border cursor-pointer transition-colors active:scale-98 bg-slate-900 border-slate-600 hover:border-slate-500';
-        label.innerHTML=\`<input type="radio" name="\${name}" value="\${opt.value}" onchange="updateFormState()" class="w-5 h-5 flex-shrink-0 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
-                         <div class="flex-grow">\${opt.icon||''}</div>
-                         <span class="text-xs sm:text-sm text-slate-200 flex-grow text-right">\${opt.label}</span>\`;
+        label.innerHTML=`<input type="radio" name="${name}" value="${opt.value}" onchange="updateFormState()" class="w-5 h-5 flex-shrink-0 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
+                         <div class="flex-grow">${opt.icon||''}</div>
+                         <span class="text-xs sm:text-sm text-slate-200 flex-grow text-right">${opt.label}</span>`;
         container.appendChild(label);
       };
       const createRadioSimple=(n,o,c)=>{
         const l=document.createElement('label');
         l.className='flex items-center gap-2.5 sm:gap-3 p-3 sm:p-3.5 rounded-md border cursor-pointer transition-colors active:scale-98 bg-slate-900 border-slate-600 hover:border-slate-500';
-        l.innerHTML=\`<input type="radio" name="\${n}" value="\${o.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
-                     <span class="text-xs sm:text-sm text-slate-200">\${o.label}</span>\`;
+        l.innerHTML=`<input type="radio" name="${n}" value="${o.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
+                     <span class="text-xs sm:text-sm text-slate-200">${o.label}</span>`;
         c.appendChild(l);
       };
       const createRadioCenter=(n,o,c)=>{
         const l=document.createElement('label');
         l.className='flex items-center justify-center gap-2 p-3 sm:p-3.5 rounded-md border cursor-pointer transition-colors active:scale-95 bg-slate-900 border-slate-600 hover:border-slate-500';
-        l.innerHTML=\`<input type="radio" name="\${n}" value="\${o.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
-                     <span class="text-xs sm:text-sm text-slate-200">\${o.value}</span>\`;
+        l.innerHTML=`<input type="radio" name="${n}" value="${o.value}" onchange="updateFormState()" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 bg-slate-700 border-slate-500 focus:ring-emerald-500">
+                     <span class="text-xs sm:text-sm text-slate-200">${o.value}</span>`;
         c.appendChild(l);
       };
       const createButton=(field,value,container)=>{
@@ -540,7 +499,7 @@
       formData.address = DOMElements.addressInput.value;
       formData.floor = DOMElements.floorInput.value;
       formData.buildingType = DOMElements.buildingTypeSelect.value;
-      const getVal = n => document.querySelector(\`input[name="\${n}"]:checked\`)?.value || '';
+      const getVal = n => document.querySelector(`input[name="${n}"]:checked`)?.value || '';
       formData.direction       = getVal('direction');
       formData.sunlightHours   = getVal('sunlightHours');
       formData.alleyPosition   = getVal('alleyPosition');
@@ -592,12 +551,12 @@
       if(!window.Kakao||!window.Kakao.isInitialized()){ alert('카카오톡 공유 기능을 사용하려면 카카오 JavaScript 키를 설정하고 앱을 등록해야 합니다.'); return; }
       window.Kakao.Share.sendDefault({
         objectType:'feed',
-        content:{ title:'우리집 풍수 진단 결과', description:\`\${r.address}의 풍수 점수는 \${r.totalScore}점! \${r.grade} \${r.emoji}\`, imageUrl:'https://picsum.photos/seed/fengshui/800/400', link:{ mobileWebUrl:location.href, webUrl:location.href } },
+        content:{ title:'우리집 풍수 진단 결과', description:`${r.address}의 풍수 점수는 ${r.totalScore}점! ${r.grade} ${r.emoji}`, imageUrl:'https://picsum.photos/seed/fengshui/800/400', link:{ mobileWebUrl:location.href, webUrl:location.href } },
         buttons:[{ title:'우리집도 진단하기', link:{ mobileWebUrl:location.origin, webUrl:location.origin } }]
       });
     }
-    function shareToFacebook(){ const url=encodeURIComponent(location.href); window.open(\`https://www.facebook.com/sharer/sharer.php?u=\${url}\`,'_blank','width=600,height=400'); }
-    function shareToTwitter(){ const r=appState.result; if(!r) return; const text=encodeURIComponent(\`우리집 풍수 점수는 \${r.totalScore}점! \${r.grade} \${r.emoji}\n\`); const url=encodeURIComponent(location.href); window.open(\`https://twitter.com/intent/tweet?text=\${text}&url=\${url}\`,'_blank','width=600,height=400'); }
+    function shareToFacebook(){ const url=encodeURIComponent(location.href); window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`,'_blank','width=600,height=400'); }
+    function shareToTwitter(){ const r=appState.result; if(!r) return; const text=encodeURIComponent(`우리집 풍수 점수는 ${r.totalScore}점! ${r.grade} ${r.emoji}\n`); const url=encodeURIComponent(location.href); window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`,'_blank','width=600,height=400'); }
     function copyLink(){ navigator.clipboard.writeText(location.href).then(()=>{ document.getElementById('copy-link-default').classList.add('hidden'); document.getElementById('copy-link-success').classList.remove('hidden'); setTimeout(()=>{ document.getElementById('copy-link-default').classList.remove('hidden'); document.getElementById('copy-link-success').classList.add('hidden'); },2000); }).catch(()=>alert('링크 복사에 실패했습니다.')); }
 
     /* === 안전한 AdSense 렌더링: 보이는 순간에만 push() === */
@@ -626,30 +585,6 @@
         if(!hidden) adObserver.observe(ins);
       });
     }
-
-    // **중앙 정렬 강제 보정: iframe이 DOM에 추가되면 margin:0 auto 적용**
-    function forceCenterAds(){
-      document.querySelectorAll('ins.adsbygoogle').forEach(ins=>{
-        const iframe=ins.querySelector('iframe');
-        if(iframe){
-          iframe.style.margin='0 auto';
-          iframe.style.display='block';
-          // iOS 사파리 소수점 반올림 이슈 보정
-          iframe.style.transform='translateZ(0)';
-        }
-      });
-    }
-    const adDomObserver=new MutationObserver((mutations)=>{
-      let touched=false;
-      for(const m of mutations){
-        if(m.type==='childList' && (m.addedNodes.length>0 || m.removedNodes.length>0)){
-          touched=true;
-          break;
-        }
-      }
-      if(touched){ forceCenterAds(); }
-    });
-    adDomObserver.observe(document.body,{childList:true,subtree:true});
 
     // 광고2 DOM을 결과/폼 사이에서 이동시켜 항상 한 개가 보이도록
     function relocateAd2(){
@@ -685,9 +620,8 @@
 
       if(appState.loading) DOMElements.loadingStep.textContent=appState.loadingStep;
 
-      // 현재 보이는 광고들을 관찰/푸시 + 중앙정렬 보정
+      // 현재 보이는 광고들을 관찰/푸시
       observeVisibleAds(document);
-      forceCenterAds();
 
       // 광고2를 현재 보여지는 섹션으로 이동
       relocateAd2();
@@ -695,29 +629,21 @@
       if(appState.result){
         renderResultData(appState.result);
         observeVisibleAds(document.getElementById('result-section'));
-        forceCenterAds();
       }
     }
 
     /* ---- 이하 분석/렌더링 보일러플레이트(원문 그대로) ---- */
     function renderResultData(result){
       document.getElementById('result-address').textContent=result.address;
-      document.getElementById('result-details').textContent=\`\${result.formData.floor}층 \${result.formData.direction} \${result.formData.buildingType}\`;
+      document.getElementById('result-details').textContent=`${result.formData.floor}층 ${result.formData.direction} ${result.formData.buildingType}`;
       document.getElementById('result-emoji').textContent=result.emoji;
       document.getElementById('result-grade').textContent=result.grade;
       const nearbyEl=document.getElementById('result-nearby');
-      nearbyEl.innerHTML = \`<p>🏔️ 주변 산: \${result.nearbyData.mountains}개</p><p>💧 주변 수계: \${result.nearbyData.rivers}개</p><p>🌳 주변 공원: \${result.nearbyData.parks}개</p>\`;
+      nearbyEl.innerHTML = `<p>🏔️ 주변 산: ${result.nearbyData.mountains}개</p><p>💧 주변 수계: ${result.nearbyData.rivers}개</p><p>🌳 주변 공원: ${result.nearbyData.parks}개</p>`;
       renderScoreGauge(result.totalScore);
       renderAnalysisItems('positive', result.positiveItems);
       renderAnalysisItems('negative', result.negativeItems);
       renderSolutions(result.solutions);
-
-      // 외부 CTA 링크(동일 탭 이동) — 필요 URL만 교체
-      const fortune = document.getElementById('fortune-link');
-      if(fortune){
-        // TODO: 원하는 무료 운세 사이트 URL로 변경하세요.
-        fortune.href = 'https://example.com/fortune'; // ← 여기 교체
-      }
     }
     function renderScoreGauge(score){
       const circle=document.getElementById('score-gauge-circle');
@@ -725,34 +651,34 @@
       const circumference=2*Math.PI*52;
       const offset=circumference-(score/100)*circumference;
       let colorClass='text-emerald-400'; if(score<40) colorClass='text-red-400'; else if(score<60) colorClass='text-yellow-400'; else if(score<80) colorClass='text-cyan-400';
-      setTimeout(()=>{ circle.style.strokeDashoffset=offset; circle.setAttribute('class',\`transform -rotate-90 origin-center transition-all duration-1000 \${colorClass}\`); },100);
-      textContainer.setAttribute('class',\`absolute inset-0 flex flex-col items-center justify-center \${colorClass}\`);
-      textContainer.innerHTML=\`<span class="text-5xl font-bold">\${score}</span><span class="text-lg">점</span>\`;
+      setTimeout(()=>{ circle.style.strokeDashoffset=offset; circle.setAttribute('class',`transform -rotate-90 origin-center transition-all duration-1000 ${colorClass}`); },100);
+      textContainer.setAttribute('class',`absolute inset-0 flex flex-col items-center justify-center ${colorClass}`);
+      textContainer.innerHTML=`<span class="text-5xl font-bold">${score}</span><span class="text-lg">점</span>`;
     }
     function renderAnalysisItems(type, items){
-      const containerId=\`\${type}-items-container\`, sectionId=\`\${type}-section\`;
+      const containerId=`${type}-items-container`, sectionId=`${type}-section`;
       const container=document.getElementById(containerId), section=document.getElementById(sectionId);
       if(items.length===0){ section.classList.add('hidden'); return; } section.classList.remove('hidden');
       const isPositive=type==='positive', color=isPositive?'emerald':'red', icon=isPositive?'arrow-up':'arrow-down';
       container.innerHTML = items.map(item=>
-        \`<div class="bg-slate-800/50 p-3 sm:p-4 rounded-lg border border-\${color}-900/30">
+        `<div class="bg-slate-800/50 p-3 sm:p-4 rounded-lg border border-${color}-900/30">
           <button onclick="toggleExpand(this)" class="w-full flex items-start gap-3 sm:gap-4">
-            <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-\${color}-900/50 text-\${color}-400">
-              <i data-lucide="\${icon}" class="sm:w-6 sm:h-6" style="width:18px;height:18px;"></i>
+            <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-${color}-900/50 text-${color}-400">
+              <i data-lucide="${icon}" class="sm:w-6 sm:h-6" style="width:18px;height:18px;"></i>
             </div>
             <div class="flex-1 text-left">
               <h4 class="font-semibold text-slate-100 text-sm sm:text-base">
-                \${item.title}
-                <span class="ml-2 text-xs sm:text-sm font-bold text-\${color}-400">(\${item.score>0?'+':''}\${item.score}점)</span>
+                ${item.title}
+                <span class="ml-2 text-xs sm:text-sm font-bold text-${color}-400">(${item.score>0?'+':''}${item.score}점)</span>
               </h4>
-              <p class="text-slate-400 text-xs sm:text-sm mt-1">\${item.description}</p>
+              <p class="text-slate-400 text-xs sm:text-sm mt-1">${item.description}</p>
             </div>
-            <i data-lucide="chevron-down" class="text-\${color}-400 w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 transition-transform"></i>
+            <i data-lucide="chevron-down" class="text-${color}-400 w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 transition-transform"></i>
           </button>
-          <div class="hidden ml-11 sm:ml-14 mt-2 sm:mt-3 p-2.5 sm:p-3 bg-\${color}-900/20 rounded-lg">
-            <p class="text-xs sm:text-sm text-\${color}-200/80">\${isPositive?'💡':'⚠️'} \${item.reason}</p>
+          <div class="hidden ml-11 sm:ml-14 mt-2 sm:mt-3 p-2.5 sm:p-3 bg-${color}-900/20 rounded-lg">
+            <p class="text-xs sm:text-sm text-${color}-200/80">${isPositive?'💡':'⚠️'} ${item.reason}</p>
           </div>
-        </div>\`).join('');
+        </div>`).join('');
       if(window.lucide) lucide.createIcons();
     }
     function renderSolutions(solutions){
@@ -760,16 +686,16 @@
       if(solutions.length===0){ section.classList.add('hidden'); return; }
       section.classList.remove('hidden');
       container.innerHTML = solutions.map(sol=>
-        \`<div class="bg-yellow-900/20 p-3 sm:p-4 rounded-lg border border-yellow-400/30">
+        `<div class="bg-yellow-900/20 p-3 sm:p-4 rounded-lg border border-yellow-400/30">
           <div class="flex items-start gap-3 sm:gap-4">
             <i data-lucide="lightbulb" class="w-8 h-8 sm:w-10 sm:h-10 text-yellow-400 flex-shrink-0"></i>
             <div>
-              <h4 class="font-semibold text-yellow-300 mb-1.5 sm:mb-2 text-sm sm:text-base">\${sol.title}</h4>
-              <p class="text-yellow-200/80 text-xs sm:text-sm mb-1.5 sm:mb-2">\${sol.description}</p>
-              <p class="text-yellow-200/60 text-xs italic">💡 \${sol.reason}</p>
+              <h4 class="font-semibold text-yellow-300 mb-1.5 sm:mb-2 text-sm sm:text-base">${sol.title}</h4>
+              <p class="text-yellow-200/80 text-xs sm:text-sm mb-1.5 sm:mb-2">${sol.description}</p>
+              <p class="text-yellow-200/60 text-xs italic">💡 ${sol.reason}</p>
             </div>
           </div>
-        </div>\`).join('');
+        </div>`).join('');
       if(window.lucide) lucide.createIcons();
     }
 
@@ -781,15 +707,15 @@
       setLoadingStep('주소를 좌표로 변환 중...');
       let coords;
       try{
-        const res=await fetch(\`\${VERCEL_PROXY_URL}/api/proxy?address=\${encodeURIComponent(formData.address)}\`);
-        if(!res.ok) throw new Error(\`서버 응답 오류: \${res.status}\`);
+        const res=await fetch(`${VERCEL_PROXY_URL}/api/proxy?address=${encodeURIComponent(formData.address)}`);
+        if(!res.ok) throw new Error(`서버 응답 오류: ${res.status}`);
         const data=await res.json();
         if(data.documents&&data.documents.length>0){ const {x,y}=data.documents[0]; coords={lat:parseFloat(y),lng:parseFloat(x)}; }
         else throw new Error('주소를 찾을 수 없습니다. 좀 더 자세히 입력해보세요.');
-      }catch(e){ console.error(e); throw new Error(\`주소 변환 중 오류가 발생했습니다: \${e.message}\`); }
+      }catch(e){ console.error(e); throw new Error(`주소 변환 중 오류가 발생했습니다: ${e.message}`); }
       await sleep(500);
       const searchNearby=async (keyword,radius)=>{
-        try{ const res=await fetch(\`\${VERCEL_PROXY_URL}/api/proxy?keyword=\${encodeURIComponent(keyword)}&lat=\${coords.lat}&lng=\${coords.lng}&radius=\${radius}\`); if(!res.ok) return 0; const d=await res.json(); return d.documents?.length||0; }
+        try{ const res=await fetch(`${VERCEL_PROXY_URL}/api/proxy?keyword=${encodeURIComponent(keyword)}&lat=${coords.lat}&lng=${coords.lng}&radius=${radius}`); if(!res.ok) return 0; const d=await res.json(); return d.documents?.length||0; }
         catch(e){ console.error(e); return 0; }
       };
       setLoadingStep('주변 지형 분석 중...'); const mountains=await searchNearby('산',1000); const rivers=await searchNearby('강',1000);
@@ -804,17 +730,17 @@
 
       if(formData.riverShape==='궁수'){ score+=15; positiveItems.push({title:'금성환포 (金星環抱) - 궁수',description:'강이 집을 감싸 안는 형태로, 재물이 모이고 귀인의 도움을 받는 최고의 명당입니다.',reason:'물이란 재물을 뜻하며, 물이 나를 감싸는 것은 재물이 나에게 모이는 형국입니다.',score:15});}
       else if(formData.riverShape==='반궁수'){ score-=15; negativeItems.push({title:'반궁수 (反弓水) - 배신과 이탈',description:'강이 집을 등지고 활처럼 휘어 나가, 재물이 흩어지고 인심을 잃기 쉽습니다.',reason:'물이 등을 돌리고 나가는 것은 재물과 사람이 나를 떠나가는 형국입니다.',score:-15}); solutions.push({title:'반궁수 비보책',description:'강이 보이는 창가에 팔괘경이나 볼록거울을 두어 흉한 기운을 반사시키고, 집안에 관엽식물을 많이 두어 생기를 보충하세요.',reason:'거울은 나쁜 기운을 쳐내는 역할을 하며, 식물의 생명력은 흩어지는 기운을 안정시키는 데 도움을 줍니다.'});}
-      else if(rivers>0 && hasBalconyRiver){ score+=5; positiveItems.push({title:'수간재물 (水干財物)',description:\`거실에서 \${rivers}개의 수계가 보여 재물운에 도움이 됩니다.\`,reason:'물은 재물을 상징합니다. 강의 모양을 선택하면 더 정확한 분석이 가능합니다.',score:5});}
-      if(mountains>0 && hasBalconyMountain){ score+=10; positiveItems.push({title:'배산 (背山) - 든든한 뒷배',description:\`주변 \${mountains}개의 산이 뒤에서 받쳐주는 형태입니다.\`,reason:'산이 바람을 막아주고 안정감을 주며, 귀인의 도움을 받는 운이 있습니다.',score:10});}
-      if(parks>0){ score+=10; positiveItems.push({title:'명당 (明堂) - 넓은 공간',description:\`주변 \${parks}개의 공원이 있어 기운이 모일 넓은 공간이 있습니다.\`,reason:'집 앞에 넓고 깨끗한 공간이 있으면 재물운이 상승하고 생기가 넘칩니다.',score:10});}
-      if(floor>=3 && floor<=8){ score+=10; positiveItems.push({title:\`지기 강한 \${floor}층\`,description:'나무가 자랄 수 있는 높이(20m) 내에 있어 땅의 기운을 충분히 받습니다.',reason:'지기는 3-8층까지 미치며, 이 범위가 건강과 생명력이 가장 왕성합니다.',score:10});}
-      else if(floor>=15){ score-=20; negativeItems.push({title:\`고층 \${floor}층 - 지기 부족\`,description:'15층 이상 고층으로 땅의 기운이 미치지 않습니다.',reason:'고층일수록 땅의 자기장이 약해집니다.',score:-20}); solutions.push({title:'고층 지기 보완책',description:'실내에 흙을 많이 담은 큰 화분을 여러 개 두고, 천연석 소품을 배치하세요.',reason:'식물의 흙과 돌이 미세하게나마 지자기를 전달합니다.'});}
+      else if(rivers>0 && hasBalconyRiver){ score+=5; positiveItems.push({title:'수간재물 (水干財物)',description:`거실에서 ${rivers}개의 수계가 보여 재물운에 도움이 됩니다.`,reason:'물은 재물을 상징합니다. 강의 모양을 선택하면 더 정확한 분석이 가능합니다.',score:5});}
+      if(mountains>0 && hasBalconyMountain){ score+=10; positiveItems.push({title:'배산 (背山) - 든든한 뒷배',description:`주변 ${mountains}개의 산이 뒤에서 받쳐주는 형태입니다.`,reason:'산이 바람을 막아주고 안정감을 주며, 귀인의 도움을 받는 운이 있습니다.',score:10});}
+      if(parks>0){ score+=10; positiveItems.push({title:'명당 (明堂) - 넓은 공간',description:`주변 ${parks}개의 공원이 있어 기운이 모일 넓은 공간이 있습니다.`,reason:'집 앞에 넓고 깨끗한 공간이 있으면 재물운이 상승하고 생기가 넘칩니다.',score:10});}
+      if(floor>=3 && floor<=8){ score+=10; positiveItems.push({title:`지기 강한 ${floor}층`,description:'나무가 자랄 수 있는 높이(20m) 내에 있어 땅의 기운을 충분히 받습니다.',reason:'지기는 3-8층까지 미치며, 이 범위가 건강과 생명력이 가장 왕성합니다.',score:10});}
+      else if(floor>=15){ score-=20; negativeItems.push({title:`고층 ${floor}층 - 지기 부족`,description:'15층 이상 고층으로 땅의 기운이 미치지 않습니다.',reason:'고층일수록 땅의 자기장이 약해집니다.',score:-20}); solutions.push({title:'고층 지기 보완책',description:'실내에 흙을 많이 담은 큰 화분을 여러 개 두고, 천연석 소품을 배치하세요.',reason:'식물의 흙과 돌이 미세하게나마 지자기를 전달합니다.'});}
       if(formData.direction==='남향'){ score+=10; positiveItems.push({title:'정남향',description:'햇빛이 하루 3시간 이상 잘 들어 생기가 넘칩니다.',reason:'특히 낮 12-2시에 햇빛이 정면으로 들어와 양의 기운이 가득합니다.',score:10});}
       else if(formData.direction==='동향'){ score+=5; positiveItems.push({title:'동향 - 아침 햇살',description:'아침 햇살이 들어와 하루를 활기차게 시작할 수 있습니다.',reason:'아침 햇빛은 하루의 기운을 시작하는 길한 에너지입니다.',score:5});}
       else if(formData.direction==='서향'){ score-=5; negativeItems.push({title:'서향 - 오후 햇빛',description:'오후 4-6시에 강한 햇빛이 들어와 여름에 더울 수 있습니다.',reason:'저녁 햇빛은 밤의 시작을 알리는 기운입니다.',score:-5});}
       else if(formData.direction==='북향'){ score-=10; negativeItems.push({title:'북향 - 햇빛 부족',description:'햇빛이 거의 들지 않아 음습할 수 있습니다.',reason:'햇빛 부족은 생기를 약화시킵니다.',score:-10});}
-      if(towers>0){ score-=20; negativeItems.push({title:'송전탑 인근 (高壓線)',description:\`200m 내에 \${towers}개의 송전탑이 있습니다.\`,reason:'강한 전자기장은 땅의 기운을 어지럽힙니다.',score:-20});}
-      if(tunnels>0){ score-=30; negativeItems.push({title:'터널 근처 (隧道)',description:\`500m 내에 \${tunnels}개의 터널이 있습니다.\`,reason:'터널은 땅의 혈관을 끊는 형상입니다.',score:-30});}
+      if(towers>0){ score-=20; negativeItems.push({title:'송전탑 인근 (高壓線)',description:`200m 내에 ${towers}개의 송전탑이 있습니다.`,reason:'강한 전자기장은 땅의 기운을 어지럽힙니다.',score:-20});}
+      if(tunnels>0){ score-=30; negativeItems.push({title:'터널 근처 (隧道)',description:`500m 내에 ${tunnels}개의 터널이 있습니다.`,reason:'터널은 땅의 혈관을 끊는 형상입니다.',score:-30});}
       if(hasBalconyBuilding && !hasBalconyMountain){ score-=15; negativeItems.push({title:'앞을 가로막는 건물',description:'거실 앞 건물이 조망을 막습니다.',reason:'막힌 조망은 흐름을 답답하게 합니다.',score:-15});}
       if(formData.sunlightHours==='거의없음'){ score-=15; negativeItems.push({title:'햇빛 부족',description:'하루 햇빛이 거의 들지 않습니다.',reason:'최소 3시간 이상 채광이 이상적입니다.',score:-15});}
       else if(formData.sunlightHours==='1-2시간'){ score-=5; negativeItems.push({title:'햇빛 다소 부족',description:'1~2시간은 충분하지 않습니다.',reason:'3시간 이상이 권장됩니다.',score:-5});}
