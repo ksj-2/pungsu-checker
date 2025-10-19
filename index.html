@@ -34,7 +34,36 @@
 html, body { overflow-x: hidden; }
   img, svg, video, canvas { max-width: 100%; height: auto; }
   .container, header, main, footer, #app { max-width: 100vw; }
-</style>
+
+  /* 광고 공통 래퍼: 화면 가운데 정렬 + 가로폭 안전망 */
+  .ad-wrap { 
+    display:block;
+    width:100%;
+    text-align:center;     /* 자식 inline-block을 가운데 */
+    margin: 12px auto;
+    overflow: visible !important;  /* iFrame 클리핑 방지 */
+  }
+  /* 실제 광고 슬롯(자식)을 inline-block으로 두고 부모에서 중앙정렬 */
+  .ad-wrap > .ad-box {
+    display:inline-block;
+    width:100%;
+    max-width: 336px;      /* 모바일 최대(336x280 대응) */
+  }
+  /* 더 넓은 화면에서 점진 확대 */
+  @media (min-width: 640px) { .ad-wrap > .ad-box { max-width: 600px; } }
+  @media (min-width: 1024px){ .ad-wrap > .ad-box { max-width: 728px; } }
+  @media (min-width: 1280px){ .ad-wrap > .ad-box { max-width: 970px; } }
+
+  /* AdSense 권장: 슬롯 자체는 block + 가득 채우기 */
+  .ad-box > ins.adsbygoogle {
+    display:block !important;
+    width:100% !important;
+  }
+
+  /* 부모가 overflow:hidden 인 카드/섹션 안에 넣지 않도록 */
+  .no-clip { overflow: visible !important; }
+   
+    </style>
 <link rel="stylesheet" href="/index.css">
 
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=YOUR_ADSENSE_CLIENT" crossorigin="anonymous"></script>
