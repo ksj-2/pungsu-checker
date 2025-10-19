@@ -55,9 +55,6 @@
       margin: 12px auto;
       text-align: center !important;
       overflow: visible !important;
-      /* --- FIX: ensure ads never overlay CTAs --- */
-      position: relative; 
-      z-index: 0;
     }
     .ad-wrap * { box-sizing: border-box; }
 
@@ -69,9 +66,6 @@
       margin: 0 auto;
       overflow: visible !important;
       text-align: center !important;
-      /* --- FIX: ensure ads never overlay CTAs --- */
-      position: relative;
-      z-index: 0;
     }
     @media (min-width:640px){ .ad-wrap > .ad-box { max-width: 600px; } }
     @media (min-width:1024px){ .ad-wrap > .ad-box { max-width: 728px; } }
@@ -84,18 +78,12 @@
       overflow: visible !important;
       text-align: center !important;
       min-height: 50px;
-      /* --- FIX: ensure ad layer stays behind links --- */
-      position: relative;
-      z-index: 0;
     }
 
     .ad-wrap iframe {
       display: block !important;
       margin: 0 auto !important;
       max-width: 100% !important;
-      /* --- FIX: make sure Google iframe cannot steal clicks from CTA --- */
-      position: relative;
-      z-index: 0;
     }
 
     .ad-wrap.fullbleed {
@@ -104,30 +92,6 @@
       margin-right: calc(50% - 50vw);
       padding-left: 12px;
       padding-right: 12px;
-    }
-
-    /* === MOBILE AD CENTERING HARDENING ===
-       Some devices render the ad iframe with unexpected inline widths.
-       Use flex centering on small screens to eliminate right-shift. */
-    @media (max-width: 639px) {
-      .ad-wrap,
-      .ad-wrap > .ad-box {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-      }
-      .ad-box > ins.adsbygoogle,
-      .ad-wrap iframe {
-        margin-left: auto !important;
-        margin-right: auto !important;
-      }
-    }
-
-    /* CTA should always be above any ad layers */
-    #fortune-link {
-      position: relative;
-      z-index: 10;
-      pointer-events: auto;
     }
   </style>
 
@@ -658,30 +622,11 @@
     // 중앙 정렬 강제 보정
     function forceCenterAds(){
       document.querySelectorAll('ins.adsbygoogle').forEach(ins=>{
-        // ensure INS itself is centered
-        ins.style.margin = '0 auto';
-        ins.style.display = 'block';
-        ins.style.maxWidth = '100%';
         const iframe=ins.querySelector('iframe');
         if(iframe){
           iframe.style.margin='0 auto';
           iframe.style.display='block';
           iframe.style.transform='translateZ(0)';
-          // avoid any accidental overflow widths
-          iframe.style.maxWidth='100%';
-        }
-        // ensure wrapper boxes are using center alignment on all engines
-        const box = ins.closest('.ad-box');
-        const wrap = ins.closest('.ad-wrap');
-        if(box){
-          box.style.display='flex';
-          box.style.justifyContent='center';
-          box.style.alignItems='center';
-        }
-        if(wrap){
-          wrap.style.display='flex';
-          wrap.style.justifyContent='center';
-          wrap.style.alignItems='center';
         }
       });
     }
@@ -863,8 +808,6 @@
       if (DOMElements.balconyTipToggle) DOMElements.balconyTipToggle.addEventListener('click', ()=> DOMElements.balconyTipContent.classList.toggle('hidden'));
       if(window.lucide) lucide.createIcons();
       renderApp();
-      // extra pass to ensure centering after first paint
-      setTimeout(forceCenterAds, 300);
     });
   </script>
 </body>
