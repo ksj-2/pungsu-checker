@@ -43,18 +43,20 @@
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #475569; }
     input[type="radio"] { box-shadow: none; }
-    html, body { overflow-x: hidden; }
+    html, body { overflow-x: hidden; margin: 0; }
     img, svg, video, canvas { max-width: 100%; height: auto; }
     .container, header, main, footer, #app { max-width: 100vw; }
 
-    /* === SAFE AD WRAPPERS === */
+    /* === SAFE AD WRAPPERS (모바일 치우침/겹침 방지) === */
     .ad-wrap {
       display: grid;
       place-items: center;
       width: 100%;
       margin: 12px auto;
       text-align: center !important;
-      overflow: visible !important;
+      position: relative;
+      overflow: hidden; /* <- 광고 iframe이 부모 밖으로 새어 나와 클릭 막는 문제 방지 */
+      z-index: 0;
     }
     .ad-wrap * { box-sizing: border-box; }
 
@@ -64,8 +66,10 @@
       width: 100%;
       max-width: 360px;
       margin: 0 auto;
-      overflow: visible !important;
+      position: relative;
+      overflow: hidden; /* <- 우측으로 살짝 잘리는 현상/겹침 방지 */
       text-align: center !important;
+      z-index: 0;
     }
     @media (min-width:640px){ .ad-wrap > .ad-box { max-width: 600px; } }
     @media (min-width:1024px){ .ad-wrap > .ad-box { max-width: 728px; } }
@@ -74,16 +78,28 @@
     .ad-box > ins.adsbygoogle {
       display: block !important;
       width: 100% !important;
-      margin: 0 auto !important;
-      overflow: visible !important;
+      max-width: 100vw !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      overflow: hidden !important;
       text-align: center !important;
       min-height: 50px;
+      z-index: 0;
+    }
+
+    /* iOS 16+ 안전한 뷰포트 폭 적용 */
+    @supports (width: 100svw) {
+      .ad-box > ins.adsbygoogle,
+      .ad-wrap iframe { max-width: 100svw !important; }
     }
 
     .ad-wrap iframe {
       display: block !important;
-      margin: 0 auto !important;
-      max-width: 100% !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      max-width: 100vw !important;
+      height: auto;
+      z-index: 0;
     }
 
     .ad-wrap.fullbleed {
@@ -94,33 +110,22 @@
       padding-right: 12px;
     }
 
-    /* === FIX: 모바일에서 광고가 미세하게 오른쪽으로 치우치거나 잘리는 문제 보정 === */
-    /* - viewport safe area를 고려하고, 부모 padding의 영향을 제거하기 위해
-       모바일에서 광고 래퍼를 뷰포트 기준(full-bleed)으로 확장합니다. */
-    @media (max-width: 640px) {
-      .ad-wrap {
-        width: 100svw !important;
-        margin-left: calc(50% - 50svw) !important;
-        margin-right: calc(50% - 50svw) !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-      }
-      .ad-wrap > .ad-box {
-        max-width: 100svw !important;
-      }
-      .ad-box > ins.adsbygoogle {
-        max-width: 100svw !important;
-      }
-      .ad-wrap iframe {
-        max-width: 100svw !important;
-      }
+    /* 눈에 띄는 빨간 CTA 버튼 공통 스타일 */
+    .cta-red {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 0.875rem 1.25rem;
+      border-radius: 0.5rem;
+      font-weight: 800;
+      color: #fff;
+      background-color: #ef4444; /* red-500 */
+      box-shadow: 0 10px 15px -3px rgba(239,68,68,.2), 0 4px 6px -2px rgba(239,68,68,.2);
+      transition: transform .08s ease, opacity .2s ease, background-color .2s ease;
     }
-
-    /* 광고 요소의 중앙 정렬 강제 (서브픽셀/스마트폰 렌더링 이슈 보정) */
-    ins.adsbygoogle {
-      margin-left: auto !important;
-      margin-right: auto !important;
-    }
+    .cta-red:hover { background-color: #f05252; } /* red-500 hover variant */
+    .cta-red:active { transform: scale(.98); }
   </style>
 
   <link rel="stylesheet" href="/index.css">
@@ -298,6 +303,14 @@
           <p id="error-message" class="hidden text-red-400 text-center text-sm sm:text-base"></p>
         </form>
 
+        <!-- 폼 하단 CTA: 결과 보기 전에도 항상 노출 -->
+        <div class="mt-4">
+          <a id="fortune-link-form" href="https://www.shinhanlife.co.kr/hp/cdhg0130.do" class="cta-red">
+            🔮 무료 운세 보러가기
+          </a>
+          <p class="mt-2 text-xs text-slate-400 text-center">외부 사이트로 이동합니다. (동일 탭)</p>
+        </div>
+
         <!-- [광고 2] 폼 아래 (고유 슬롯) — 결과 화면으로 이동/복귀가 가능한 단일 DOM 노드 -->
         <div id="ad2-holder-form" class="mt-6 sm:mt-8 p-4 sm:p-6 bg-slate-800/30 rounded-lg text-center text-xs sm:text-sm text-slate-500 border border-slate-700">
           <div id="ad2-block" class="ad-wrap">
@@ -353,10 +366,9 @@
             </div>
           </div>
 
-          <!-- (이동) 외부 이동 CTA: 점수 카드 바로 아래로 배치 & 빨간 버튼으로 변경 -->
+          <!-- 결과 화면 CTA (점수 카드 바로 아래에 고정) -->
           <div class="p-3 sm:p-4 bg-slate-800/40 rounded-lg border border-slate-700 text-center">
-            <a id="fortune-link" href="https://www.shinhanlife.co.kr/hp/cdhg0130.do"
-               class="block w-full px-5 py-4 rounded-lg font-extrabold bg-red-600 hover:bg-red-700 active:scale-95 transition-all text-white text-base sm:text-lg shadow-lg">
+            <a id="fortune-link" href="https://www.shinhanlife.co.kr/hp/cdhg0130.do" class="cta-red">
               🔮 무료 운세 보러가기
             </a>
             <p class="mt-2 text-xs text-slate-400">외부 사이트로 이동합니다. (동일 탭)</p>
@@ -618,21 +630,28 @@
       });
     }
     function shareToFacebook(){ const url=encodeURIComponent(location.href); window.open(\`https://www.facebook.com/sharer/sharer.php?u=\${url}\`,'_blank','width=600,height=400'); }
-    function shareToTwitter(){ const r=appState.result; if(!r) return; const text=encodeURIComponent(\`우리집 풍수 점수는 \${r.totalScore}점! \${r.grade} \${r.emoji}
-\`); const url=encodeURIComponent(location.href); window.open(\`https://twitter.com/intent/tweet?text=\${text}&url=\${url}\`,'_blank','width=600,height=400'); }
+    function shareToTwitter(){ const r=appState.result; if(!r) return; const text=encodeURIComponent(\`우리집 풍수 점수는 \${r.totalScore}점! \${r.grade} \${r.emoji}\n\`); const url=encodeURIComponent(location.href); window.open(\`https://twitter.com/intent/tweet?text=\${text}&url=\${url}\`,'_blank','width=600,height=400'); }
     function copyLink(){ navigator.clipboard.writeText(location.href).then(()=>{ document.getElementById('copy-link-default').classList.add('hidden'); document.getElementById('copy-link-success').classList.remove('hidden'); setTimeout(()=>{ document.getElementById('copy-link-default').classList.remove('hidden'); document.getElementById('copy-link-success').classList.add('hidden'); },2000); }).catch(()=>alert('링크 복사에 실패했습니다.')); }
 
-    /* === 안전한 AdSense 렌더링: 보이는 순간에만 push() === */
-    const adObserver=new IntersectionObserver((entries)=>{
-      entries.forEach(entry=>{
-        const ins=entry.target;
-        if(!entry.isIntersecting) return;
-        if(ins.dataset.adPushed==='true') return;
-        try{ (adsbygoogle=window.adsbygoogle||[]).push({}); ins.dataset.adPushed='true'; }
-        catch(e){ console.warn('adsbygoogle push error:',e); }
-        finally{ adObserver.unobserve(ins); }
-      });
-    },{root:null,threshold:0});
+    /* === 안전한 AdSense 렌더링: 보이는 순간에만 push() (모바일 호환 보강) === */
+    let adObserver = null;
+    try {
+      if ('IntersectionObserver' in window) {
+        adObserver = new IntersectionObserver((entries)=>{
+          entries.forEach(entry=>{
+            const ins=entry.target;
+            if(!entry.isIntersecting) return;
+            if(ins.dataset.adPushed==='true') return;
+            try{ (adsbygoogle=window.adsbygoogle||[]).push({}); ins.dataset.adPushed='true'; }
+            catch(e){ console.warn('adsbygoogle push error:',e); }
+            finally{ adObserver && adObserver.unobserve(ins); }
+          });
+        },{root:null,threshold:0});
+      }
+    } catch(e) {
+      console.warn('IntersectionObserver unavailable. Fallback to immediate ad push.', e);
+      adObserver = null;
+    }
 
     function observeVisibleAds(root=document){
       root.querySelectorAll('ins.adsbygoogle').forEach(ins=>{
@@ -645,22 +664,26 @@
           if(s.display==='none'||s.visibility==='hidden'){ hidden=true; break; }
           cur=cur.parentElement;
         }
-        if(!hidden) adObserver.observe(ins);
+        if(hidden) return;
+        if (adObserver) {
+          adObserver.observe(ins);
+        } else {
+          // 폴백: 바로 push (스크립트가 아직이면 큐에 쌓임)
+          try { (adsbygoogle=window.adsbygoogle||[]).push({}); ins.dataset.adPushed='true'; }
+          catch(e){ console.warn('immediate ads push error:', e); }
+        }
       });
     }
 
     // 중앙 정렬 강제 보정
     function forceCenterAds(){
       document.querySelectorAll('ins.adsbygoogle').forEach(ins=>{
-        ins.style.margin='0 auto';
-        ins.style.display='block';
-        ins.style.maxWidth='100%';
         const iframe=ins.querySelector('iframe');
         if(iframe){
           iframe.style.margin='0 auto';
           iframe.style.display='block';
           iframe.style.transform='translateZ(0)';
-          iframe.style.maxWidth='100%';
+          iframe.style.maxWidth='100vw';
         }
       });
     }
@@ -674,7 +697,7 @@
       }
       if(touched){ forceCenterAds(); }
     });
-    adDomObserver.observe(document.body,{childList:true,subtree:true});
+    try{ adDomObserver.observe(document.body,{childList:true,subtree:true}); } catch(e){ console.warn(e); }
 
     function relocateAd2(){
       const ad2Block = document.getElementById('ad2-block');
@@ -814,17 +837,17 @@
 
       if(formData.riverShape==='궁수'){ score+=15; positiveItems.push({title:'금성환포 (金星環抱) - 궁수',description:'강이 집을 감싸 안는 형태로, 재물이 모이고 귀인의 도움을 받는 최고의 명당입니다.',reason:'물이란 재물을 뜻하며, 물이 나를 감싸는 것은 재물이 나에게 모이는 형국입니다.',score:15});}
       else if(formData.riverShape==='반궁수'){ score-=15; negativeItems.push({title:'반궁수 (反弓水) - 배신과 이탈',description:'강이 집을 등지고 활처럼 휘어 나가, 재물이 흩어지고 인심을 잃기 쉽습니다.',reason:'물이 등을 돌리고 나가는 것은 재물과 사람이 나를 떠나가는 형국입니다.',score:-15}); solutions.push({title:'반궁수 비보책',description:'강이 보이는 창가에 팔괘경이나 볼록거울을 두어 흉한 기운을 반사시키고, 집안에 관엽식물을 많이 두어 생기를 보충하세요.',reason:'거울은 나쁜 기운을 쳐내는 역할을 하며, 식물의 생명력은 흩어지는 기운을 안정시키는 데 도움을 줍니다.'});}
-      else if(rivers>0 && hasBalconyRiver){ score+=5; positiveItems.push({title:'수간재물 (水干財物)',description:\`거실에서 \${rivers}개의 수계가 보여 재물운에 도움이 됩니다.\`,reason:'물은 재물을 상징합니다. 강의 모양을 선택하면 더 정확한 분석이 가능합니다.',score:5});}
-      if(mountains>0 && hasBalconyMountain){ score+=10; positiveItems.push({title:'배산 (背山) - 든든한 뒷배',description:\`주변 \${mountains}개의 산이 뒤에서 받쳐주는 형태입니다.\`,reason:'산이 바람을 막아주고 안정감을 주며, 귀인의 도움을 받는 운이 있습니다.',score:10});}
-      if(parks>0){ score+=10; positiveItems.push({title:'명당 (明堂) - 넓은 공간',description:\`주변 \${parks}개의 공원이 있어 기운이 모일 넓은 공간이 있습니다.\`,reason:'집 앞에 넓고 깨끗한 공간이 있으면 재물운이 상승하고 생기가 넘칩니다.',score:10});}
-      if(floor>=3 && floor<=8){ score+=10; positiveItems.push({title:\`지기 강한 \${floor}층\`,description:'나무가 자랄 수 있는 높이(20m) 내에 있어 땅의 기운을 충분히 받습니다.',reason:'지기는 3-8층까지 미치며, 이 범위가 건강과 생명력이 가장 왕성합니다.',score:10});}
-      else if(floor>=15){ score-=20; negativeItems.push({title:\`고층 \${floor}층 - 지기 부족\`,description:'15층 이상 고층으로 땅의 기운이 미치지 않습니다.',reason:'고층일수록 땅의 자기장이 약해집니다.',score:-20}); solutions.push({title:'고층 지기 보완책',description:'실내에 흙을 많이 담은 큰 화분을 여러 개 두고, 천연석 소품을 배치하세요.',reason:'식물의 흙과 돌이 미세하게나마 지자기를 전달합니다.'});}
+      else if(rivers>0 && hasBalconyRiver){ score+=5; positiveItems.push({title:'수간재물 (水干財物)',description:`거실에서 ${rivers}개의 수계가 보여 재물운에 도움이 됩니다.`,reason:'물은 재물을 상징합니다. 강의 모양을 선택하면 더 정확한 분석이 가능합니다.',score:5});}
+      if(mountains>0 && hasBalconyMountain){ score+=10; positiveItems.push({title:'배산 (背山) - 든든한 뒷배',description:`주변 ${mountains}개의 산이 뒤에서 받쳐주는 형태입니다.`,reason:'산이 바람을 막아주고 안정감을 주며, 귀인의 도움을 받는 운이 있습니다.',score:10});}
+      if(parks>0){ score+=10; positiveItems.push({title:'명당 (明堂) - 넓은 공간',description:`주변 ${parks}개의 공원이 있어 기운이 모일 넓은 공간이 있습니다.`,reason:'집 앞에 넓고 깨끗한 공간이 있으면 재물운이 상승하고 생기가 넘칩니다.',score:10});}
+      if(floor>=3 && floor<=8){ score+=10; positiveItems.push({title:`지기 강한 ${floor}층`,description:'나무가 자랄 수 있는 높이(20m) 내에 있어 땅의 기운을 충분히 받습니다.',reason:'지기는 3-8층까지 미치며, 이 범위가 건강과 생명력이 가장 왕성합니다.',score:10});}
+      else if(floor>=15){ score-=20; negativeItems.push({title:`고층 ${floor}층 - 지기 부족`,description:'15층 이상 고층으로 땅의 기운이 미치지 않습니다.',reason:'고층일수록 땅의 자기장이 약해집니다.',score:-20}); solutions.push({title:'고층 지기 보완책',description:'실내에 흙을 많이 담은 큰 화분을 여러 개 두고, 천연석 소품을 배치하세요.',reason:'식물의 흙과 돌이 미세하게나마 지자기를 전달합니다.'});}
       if(formData.direction==='남향'){ score+=10; positiveItems.push({title:'정남향',description:'햇빛이 하루 3시간 이상 잘 들어 생기가 넘칩니다.',reason:'특히 낮 12-2시에 햇빛이 정면으로 들어와 양의 기운이 가득합니다.',score:10});}
       else if(formData.direction==='동향'){ score+=5; positiveItems.push({title:'동향 - 아침 햇살',description:'아침 햇살이 들어와 하루를 활기차게 시작할 수 있습니다.',reason:'아침 햇빛은 하루의 기운을 시작하는 길한 에너지입니다.',score:5});}
       else if(formData.direction==='서향'){ score-=5; negativeItems.push({title:'서향 - 오후 햇빛',description:'오후 4-6시에 강한 햇빛이 들어와 여름에 더울 수 있습니다.',reason:'저녁 햇빛은 밤의 시작을 알리는 기운입니다.',score:-5});}
       else if(formData.direction==='북향'){ score-=10; negativeItems.push({title:'북향 - 햇빛 부족',description:'햇빛이 거의 들지 않아 음습할 수 있습니다.',reason:'햇빛 부족은 생기를 약화시킵니다.',score:-10});}
-      if(towers>0){ score-=20; negativeItems.push({title:'송전탑 인근 (高壓線)',description:\`200m 내에 \${towers}개의 송전탑이 있습니다.\`,reason:'강한 전자기장은 땅의 기운을 어지럽힙니다.',score:-20});}
-      if(tunnels>0){ score-=30; negativeItems.push({title:'터널 근처 (隧道)',description:\`500m 내에 \${tunnels}개의 터널이 있습니다.\`,reason:'터널은 땅의 혈관을 끊는 형상입니다.',score:-30});}
+      if(towers>0){ score-=20; negativeItems.push({title:'송전탑 인근 (高壓線)',description:`200m 내에 ${towers}개의 송전탑이 있습니다.`,reason:'강한 전자기장은 땅의 기운을 어지럽힙니다.',score:-20});}
+      if(tunnels>0){ score-=30; negativeItems.push({title:'터널 근처 (隧道)',description:`500m 내에 ${tunnels}개의 터널이 있습니다.`,reason:'터널은 땅의 혈관을 끊는 형상입니다.',score:-30});}
       if(hasBalconyBuilding && !hasBalconyMountain){ score-=15; negativeItems.push({title:'앞을 가로막는 건물',description:'거실 앞 건물이 조망을 막습니다.',reason:'막힌 조망은 흐름을 답답하게 합니다.',score:-15});}
       if(formData.sunlightHours==='거의없음'){ score-=15; negativeItems.push({title:'햇빛 부족',description:'하루 햇빛이 거의 들지 않습니다.',reason:'최소 3시간 이상 채광이 이상적입니다.',score:-15});}
       else if(formData.sunlightHours==='1-2시간'){ score-=5; negativeItems.push({title:'햇빛 다소 부족',description:'1~2시간은 충분하지 않습니다.',reason:'3시간 이상이 권장됩니다.',score:-5});}
@@ -841,14 +864,13 @@
       DOMElements.buildingTypeSelect.addEventListener('change', updateFormState);
       if (DOMElements.balconyTipToggle) DOMElements.balconyTipToggle.addEventListener('click', ()=> DOMElements.balconyTipContent.classList.toggle('hidden'));
       if(window.lucide) lucide.createIcons();
+      observeVisibleAds(document); // 초기 로딩 시점에도 관찰/푸시
       renderApp();
     });
 
-    // 창 크기/방향 변경 시 광고 중앙 정렬 재보정
-    window.addEventListener('resize', ()=>{ forceCenterAds(); observeVisibleAds(document); });
-    if (screen && screen.orientation && screen.orientation.addEventListener) {
-      screen.orientation.addEventListener('change', ()=>{ forceCenterAds(); observeVisibleAds(document); });
-    }
+    // 화면 회전/리사이즈 시 중앙정렬 재보정
+    window.addEventListener('resize', ()=>{ forceCenterAds(); });
+    window.addEventListener('orientationchange', ()=>{ setTimeout(forceCenterAds, 300); });
   </script>
 </body>
 </html>
