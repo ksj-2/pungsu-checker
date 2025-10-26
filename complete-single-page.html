@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>우리집 풍수 진단 | AI 셀프 풍수지리 전문가 분석</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #1e293b; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-200">
+  <div id="root">
+    <div class="min-h-screen flex flex-col items-center justify-center p-4">
+      <div class="text-center">
+        <div class="text-6xl mb-4">🏠</div>
+        <h1 class="text-4xl font-bold text-emerald-400 mb-4">우리집 풍수 진단</h1>
+        <p class="text-slate-400">로딩 중...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+
+  <script>
+    console.log('Script started');
+    console.log('React:', typeof React);
+    console.log('ReactDOM:', typeof ReactDOM);
+    
+    if (typeof React === 'undefined' || typeof ReactDOM === 'undefined') {
+      document.getElementById('root').innerHTML = '<div class="min-h-screen flex items-center justify-center text-red-400 text-2xl">React 로딩 실패. 페이지를 새로고침 해주세요.</div>';
+    }
+  </script>
+</body>
+</html>
