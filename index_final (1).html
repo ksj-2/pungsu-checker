@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>우리집 풍수 진단</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #1e293b; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-200">
+  
+  <div id="app"></div>
+
+  <!-- 외부 라이브러리 -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
+
+  <script>
+    // React와 ReactDOM 확인
+    if (!window.React || !window.ReactDOM) {
+      document.getElementById('app').innerHTML = '<div style="color: red; padding: 50px; text-align: center; font-size: 20px;">React 로딩 실패! 인터넷 연결을 확인해주세요.</div>';
+      throw new Error('React not loaded');
+    }
+
+    const { useState, useEffect, createElement: h } = React;
+    const { createRoot } = ReactDOM;
+
+    // 상수 정의
+    const INITIAL_FORM_DATA = {
+      address: '', floor: '', buildingType: '', direction: '',
+      balconyView: [], riverShape: '', sunlightHours: '',
+      alleyPosition: '', terrain: [], balconyExpanded: ''
+    };
+
+    // Mock API
+    async function analyzeFengShui(formData) {
+      await new Promise(r => setTimeout(r, 1500));
+      return {
+        totalScore: 88,
+        grade: "훌륭한 터",
+        emoji: "🌟",
+        positiveItems: [{
+          title: "금성환포 (金星環抱)",
+          description: "강이 집을 감싸 안는 형태로 재물이 모이는 명당입니다.",
+          reason: "물은 재물을 뜻하며, 물이 감싸는 것은 재물이 모이는 형국입니다.",
+          score: 15
+        }],
+        negativeItems: [{
+          title: "서향 - 오후 햇빛",
+          description: "오후 햇빛이 강해 여름에 더울 수 있습니다.",
+          reason: "저녁 햇빛은 하루의 기운이 저물어가는 것을 의미합니다.",
+          score: -5
+        }],
+        solutions: [{
+          title: "서향 비보책",
+          description: "서쪽에 두꺼운 커튼을 설치하고 관엽식물을 두세요.",
+          reason: "커튼은 강한 기운을 막고, 식물은 생기를 보충합니다."
+        }]
+      };
+    }
+
+    // 메인 앱
+    function App() {
+      const [step, setStep] = useState('form'); // 'form', 'loading', 'result'
+      const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+      const [result, setResult] = useState(null);
+      const [error, setError] = useState('');
+
+      useEffect(() => {
+        if (window.lucide) window.lucide.createIcons();
+        if (window.Kakao && !window.Kakao.isInitialized()) {
+          window.Kakao.init('f90959efbc49398f80378e190c64ab18');
+        }
+      }, [step]);
+
+      const handleSubmit = async () => {
+        if (!formData.address || !formData.floor) {
+          setError('주소와 층수를 입력해주세요.');
+          return;
+        }
+        setError('');
+        setStep('loading');
+        
+        try {
+          await new Promise(r => setTimeout(r, 2000));
+          const data = await analyzeFengShui(formData);
+          setResult(data);
+          setStep('result');
+        } catch (e) {
+          setError('분석 실패: ' + e.message);
+          setStep('form');
+        }
+      };
+
+      const reset = () => {
+        setStep('form');
+        setFormData(INITIAL_FORM_DATA);
+        setResult(null);
+        setError('');
+      };
+
+      // 로딩 화면
+      if (step === 'loading') {
+        return h('div', { className: 'min-h-screen flex items-center justify-center p-4' },
+          h('div', { className: 'text-center' },
+            h('div', { className: 'w-20 h-20 border-4 border-slate-600 border-t-emerald-400 rounded-full animate-spin mx-auto mb-4' }),
+            h('h3', { className: 'text-2xl font-bold text-emerald-400' }, '풍수 분석 중...'),
+            h('p', { className: 'text-slate-400 mt-2' }, '잠시만 기다려주세요')
+          )
+        );
+      }
+
+      // 결과 화면
+      if (step === 'result' && result) {
+        return h('div', { className: 'min-h-screen p-4' },
+          h('div', { className: 'max-w-2xl mx-auto' },
+            h('div', { className: 'bg-slate-800 p-8 rounded-lg text-center mb-6' },
+              h('div', { className: 'text-6xl mb-4' }, result.emoji),
+              h('div', { className: 'text-5xl font-bold text-emerald-400 mb-2' }, result.totalScore),
+              h('div', { className: 'text-sm text-slate-400' }, '/ 100점'),
+              h('h2', { className: 'text-3xl font-bold mt-4 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400' }, 
+                result.grade
+              )
+            ),
+            
+            h('div', { className: 'bg-slate-800/50 p-6 rounded-lg mb-6' },
+              h('h3', { className: 'text-xl font-bold text-emerald-400 mb-4' }, '✨ 좋은 점'),
+              ...result.positiveItems.map((item, i) => 
+                h('div', { key: i, className: 'mb-3 p-4 bg-emerald-900/20 rounded' },
+                  h('div', { className: 'font-bold text-emerald-300' }, item.title),
+                  h('div', { className: 'text-sm text-slate-300 mt-1' }, item.description)
+                )
+              )
+            ),
+
+            h('div', { className: 'bg-slate-800/50 p-6 rounded-lg mb-6' },
+              h('h3', { className: 'text-xl font-bold text-red-400 mb-4' }, '⚠️ 주의할 점'),
+              ...result.negativeItems.map((item, i) => 
+                h('div', { key: i, className: 'mb-3 p-4 bg-red-900/20 rounded' },
+                  h('div', { className: 'font-bold text-red-300' }, item.title),
+                  h('div', { className: 'text-sm text-slate-300 mt-1' }, item.description)
+                )
+              )
+            ),
+
+            h('button', {
+              onClick: reset,
+              className: 'w-full py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold rounded-lg hover:opacity-90'
+            }, '다시 진단하기')
+          )
+        );
+      }
+
+      // 폼 화면
+      return h('div', { className: 'min-h-screen p-4' },
+        h('div', { className: 'max-w-2xl mx-auto' },
+          h('header', { className: 'text-center py-8' },
+            h('h1', { className: 'text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 mb-2' },
+              '🏠 우리집 풍수 진단'
+            ),
+            h('p', { className: 'text-slate-400' }, '150년 전통 풍수 이론 + AI 분석')
+          ),
+
+          h('div', { className: 'bg-slate-800/50 p-6 rounded-lg space-y-4' },
+            h('div', null,
+              h('label', { className: 'block text-sm font-semibold mb-2' }, '주소'),
+              h('input', {
+                type: 'text',
+                placeholder: '예) 서울특별시 강남구',
+                value: formData.address,
+                onChange: (e) => setFormData({...formData, address: e.target.value}),
+                className: 'w-full px-4 py-3 bg-slate-900 border border-slate-600 rounded-md focus:ring-2 focus:ring-emerald-400 focus:outline-none'
+              })
+            ),
+
+            h('div', null,
+              h('label', { className: 'block text-sm font-semibold mb-2' }, '층수'),
+              h('input', {
+                type: 'number',
+                placeholder: '예) 7',
+                value: formData.floor,
+                onChange: (e) => setFormData({...formData, floor: e.target.value}),
+                className: 'w-full px-4 py-3 bg-slate-900 border border-slate-600 rounded-md focus:ring-2 focus:ring-emerald-400 focus:outline-none'
+              })
+            ),
+
+            error && h('p', { className: 'text-red-400 text-center' }, error),
+
+            h('button', {
+              onClick: handleSubmit,
+              className: 'w-full py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold rounded-lg hover:opacity-90 transition-all text-lg'
+            }, '풍수 감정 시작')
+          )
+        )
+      );
+    }
+
+    // 앱 시작
+    try {
+      const root = createRoot(document.getElementById('app'));
+      root.render(h(App));
+      console.log('✅ App rendered successfully!');
+    } catch (error) {
+      console.error('❌ Render error:', error);
+      document.getElementById('app').innerHTML = '<div style="color: red; padding: 50px; text-align: center;">앱 로딩 실패: ' + error.message + '</div>';
+    }
+  </script>
+</body>
+</html>
