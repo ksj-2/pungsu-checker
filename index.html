@@ -1,0 +1,222 @@
+<!-- Final build: 2025-10-28T08:27:45.049515Z -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>우리집 풍수 진단 (수정본 v5)</title>
+
+<!-- ===== Ads safe styles (prevent clipping) ===== -->
+<style>
+  /* NEVER clip the viewport – this breaks AdSense anchor width */
+  html, body {
+    overflow-x: visible !important;
+  }
+  /* If the site previously set transform/perspective/filter on html/body,
+     force-reset them; transforms on ancestors break fixed anchor width. */
+  html, body {
+    transform: none !important;
+    filter: none !important;
+    perspective: none !important;
+    backface-visibility: visible !important;
+    -webkit-transform: none !important;
+    -webkit-filter: none !important;
+    -webkit-perspective: none !important;
+  }
+  /* Full-bleed wrapper for responsive ads */
+  .ad-wrap.fullbleed {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    max-width: 100vw;
+  }
+  .ad-wrap.fullbleed > * {
+    max-width: 100vw !important;
+  }
+
+  /* ===== Form base ===== */
+  :root{
+    --bg:#0f1b2b;--panel:#132235;--txt:#e8f0ff;--muted:#9fb1c7;--accent:#21d4b4;
+  }
+  html,body{background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Noto Sans KR",Roboto,Arial,sans-serif}
+  .wrap{max-width:980px;margin:40px auto;padding:0 16px}
+  .card{background:var(--panel);border-radius:14px;padding:18px 18px 8px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .title{font-size:28px;font-weight:900;color:#37f7cd;text-align:center;margin:6px 0 16px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .field{margin-bottom:16px}
+  .label{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:var(--muted);font-weight:700}
+  input[type=text], select{width:100%;padding:14px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0b1625;color:var(--txt);outline:none}
+  /* CRITICAL: never hide radios/checkboxes */
+  input[type=radio],input[type=checkbox]{
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+    display:inline-block !important;
+    position:static !important;
+    width:auto;height:auto;margin-right:8px;
+  }
+  .options{display:flex;flex-wrap:wrap;gap:10px}
+  .chip{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;background:#0b1625;border:1px solid rgba(255,255,255,.12);cursor:pointer}
+  .cta{margin-top:12px;display:flex;gap:12px;flex-wrap:wrap}
+  .btn{flex:1 1 280px;display:inline-flex;align-items:center;justify-content:center;height:56px;border-radius:14px;background:linear-gradient(135deg,#26e0c1,#19a37f);font-weight:900;border:none;color:#012218;cursor:pointer}
+  .btn.secondary{background:#e14069;color:#fff}
+  /* RESULT PAGE bottom CTA width bug guard */
+  .cta .btn, .share-cta .btn, .result-cta .btn{width:100% !important;min-width:260px}
+
+  /* mobile */
+  @media (max-width:780px){
+    .grid{grid-template-columns:1fr}
+    .wrap{margin:20px auto}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">우리집 풍수 진단</div>
+    <div class="card">
+      <div class="grid">
+        <div class="field">
+          <div class="label">주소</div>
+          <input type="text" id="addr" placeholder="예) 서울 종로구 세종대로 209">
+        </div>
+        <div class="field">
+          <div class="label">층수</div>
+          <input type="text" id="floor" placeholder="예) 7층">
+        </div>
+        <div class="field">
+          <div class="label">건물 유형</div>
+          <select id="building">
+            <option value="">선택하세요</option>
+            <option>아파트</option><option>연립/빌라</option><option>단독주택</option><option>오피스텔</option>
+          </select>
+        </div>
+
+        <!-- 거실 방향 - Fallback: 실제 라디오를 서버렌더링 해 둔다 -->
+        <div class="field" id="dirField">
+          <div class="label">거실 방향 <a href="#" style="color:#66ffe0;text-decoration:underline">방향 확인법</a></div>
+          <div class="options" id="dirOptions">
+            <label class="chip"><input type="radio" name="dir" value="N">북</label>
+            <label class="chip"><input type="radio" name="dir" value="NE">북동</label>
+            <label class="chip"><input type="radio" name="dir" value="E">동</label>
+            <label class="chip"><input type="radio" name="dir" value="SE">남동</label>
+            <label class="chip"><input type="radio" name="dir" value="S">남</label>
+            <label class="chip"><input type="radio" name="dir" value="SW">남서</label>
+            <label class="chip"><input type="radio" name="dir" value="W">서</label>
+            <label class="chip"><input type="radio" name="dir" value="NW">북서</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label">거실 창문에서 보이는 것 (다중 선택)</div>
+          <div class="options" id="viewOptions">
+            <label class="chip"><input type="checkbox" value="산">산</label>
+            <label class="chip"><input type="checkbox" value="강">강</label>
+            <label class="chip"><input type="checkbox" value="도로">도로</label>
+            <label class="chip"><input type="checkbox" value="철도">철도</label>
+            <label class="chip"><input type="checkbox" value="공원">공원</label>
+            <label class="chip"><input type="checkbox" value="묘지">묘지</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label">하루 햇빛 시간</div>
+          <div class="options" id="sunOptions">
+            <label class="chip"><input type="radio" name="sun" value="1-2">1–2시간</label>
+            <label class="chip"><input type="radio" name="sun" value="3-4">3–4시간</label>
+            <label class="chip"><input type="radio" name="sun" value="5+">5시간 이상</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label">집의 위치</div>
+          <div class="options" id="locOptions">
+            <label class="chip"><input type="radio" name="loc" value="사거리">사거리 코너</label>
+            <label class="chip"><input type="radio" name="loc" value="막다른">막다른 골목</label>
+            <label class="chip"><input type="radio" name="loc" value="대로변">대로변</label>
+            <label class="chip"><input type="radio" name="loc" value="골목">주택 골목</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label">절지 지정 (다중 선택)</div>
+          <div class="options" id="zoneOptions">
+            <label class="chip"><input type="checkbox" value="고도">고도 제한</label>
+            <label class="chip"><input type="checkbox" value="산지">산지</label>
+            <label class="chip"><input type="checkbox" value="문화재">문화재</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label">베란다 확장 여부</div>
+          <div class="options" id="verandaOptions">
+            <label class="chip"><input type="radio" name="ver" value="Y">확장</label>
+            <label class="chip"><input type="radio" name="ver" value="N">미확장</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta">
+        <button class="btn" id="startBtn">풍수 감정 시작</button>
+        <button class="btn secondary" id="luckyBtn">무료 운세 보러가기</button>
+      </div>
+    </div>
+
+    <!-- Sample inline ad slot (will not load real ads in sandbox) -->
+    <div class="ad-wrap fullbleed" style="margin-top:24px">
+      <div style="height:90px;background:#12253a;border:1px dashed #2dd6ae;display:flex;align-items:center;justify-content:center;color:#2dd6ae">
+        반응형 광고 영역(풀블리드) – 좌우가 절대 잘리지 않아야 합니다
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ===== Robust init so options never "사라짐" ===== */
+(function(){
+  function ready(fn){
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(fn, 0);
+    } else {
+      document.addEventListener('DOMContentLoaded', fn, {once:true});
+    }
+  }
+
+  function safeInit(){
+    try{
+      // 예시: 외부 스크립트가 있어야 호출되는 초기화가 실패했을 경우를 대비해
+      // 필수 요소가 비어 있으면 한번 더 채워준다.
+      var dir = document.querySelector('#dirOptions');
+      if (dir && dir.children.length < 2){
+        dir.innerHTML = [
+          'N','NE','E','SE','S','SW','W','NW'
+        ].map(function(v){
+          var name = {N:'북',NE:'북동',E:'동',SE:'남동',S:'남',SW:'남서',W:'서',NW:'북서'}[v];
+          return '<label class="chip"><input type="radio" name="dir" value="'+v+'">'+name+'</label>';
+        }).join('');
+      }
+    }catch(e){
+      console.warn('safeInit error', e);
+    }
+  }
+
+  // 여러 타이밍으로 보강
+  ready(safeInit);
+  window.addEventListener('load', safeInit);
+  setTimeout(safeInit, 800);
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'visible') safeInit();
+  });
+
+  // 버튼 동작 데모
+  document.getElementById('luckyBtn').addEventListener('click', function(){
+    alert('운세 페이지로 이동(데모)');
+  });
+  document.getElementById('startBtn').addEventListener('click', function(){
+    alert('풍수 감정 시작(데모)');
+  });
+})();
+</script>
+
+<!-- AdSense (placeholder – real key omitted) -->
+<!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX" crossorigin="anonymous"></script> -->
+
+</body>
+</html>
