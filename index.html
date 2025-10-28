@@ -4,126 +4,72 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>우리집 풍수 진단</title>
-
-  <!-- =========================================================
-       Google AdSense
-       - 자동 광고(앵커/사이드 포함)는 애드센스 관리자에서 ON
-       - client= 에 본인 ca-pub-XXXXXXXXXXXX 를 넣으세요.
-       - 각 data-ad-slot 은 본인 슬롯 ID로 교체하세요.
-       ========================================================= -->
-  <script async
-    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1819982598567420"
-    crossorigin="anonymous"></script>
-
-  <!-- =========================================================
-       Kakao SDK (필요한 것만)
-       1) 카카오 JS SDK (공유·로그인 등)
-          - 아래 init('YOUR_KAKAO_JS_KEY')에 본인 JS 키 입력
-       2) 카카오 지도 JS SDK (주소→좌표 변환)
-          - YOUR_KAKAO_MAP_JS_KEY를 본인 JS 키로 교체
-       3) (선택) Kakao Local REST API
-          - 브라우저에 노출되므로 보안상 권장 X
-          - 정말 필요하다면 아래 KAKAO_REST_KEY에 입력(테스트 용)
-     ========================================================= -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1819982598567420" crossorigin="anonymous"></script>
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js" crossorigin="anonymous"></script>
   <script>
-    // 카카오 JS SDK init (필요 시 사용)
     try { if (window.Kakao && !Kakao.isInitialized()) { Kakao.init('YOUR_KAKAO_JS_KEY'); } } catch(e) {}
-    // (선택) REST 키 — 노출되므로 서비스 운영에서는 서버 프록시를 권장합니다.
-    const KAKAO_REST_KEY = ""; // e.g. "cd03eab98ec47c5af337c9bbdcb35c6f"
   </script>
-  <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=f90959efbc49398f80378e190c64ab18&libraries=services"></script>
-
+  <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=cd03eab98ec47c5af337c9bbdcb35c6f&libraries=services"></script>
   <style>
-    :root{
-      --bg:#0f2230; --panel:#142a3a; --line:#1d3a4e;
-      --text:#cfe8f1; --muted:#9bb8c6; --accent:#2bd3a3; --danger:#ff6b6b;
-      --chip:#0d2231; --chip-on:#0f3b2f;
-    }
+    :root{--bg:#0f2230;--panel:#142a3a;--line:#1d3a4e;--text:#cfe8f1;--muted:#9bb8c6;--accent:#2bd3a3;--danger:#ff6b6b}
     *{box-sizing:border-box}
-    html,body{margin:0; padding:0; background:var(--bg); color:var(--text); font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;}
-    a{color:var(--accent); text-decoration:none}
-    .wrap{max-width:920px; margin:0 auto; padding:24px 16px 56px}
-    header{display:flex; align-items:center; justify-content:center; gap:10px; margin:10px 0 14px}
-    header h1{display:flex; align-items:center; gap:10px; font-size: clamp(28px, 3.6vw, 42px); font-weight:800; letter-spacing:-0.5px; margin:0}
-    header .logo svg{width: clamp(28px, 3.6vw, 38px); height: auto}
-    header small{display:block; text-align:center; color:var(--muted); margin-top:6px}
-
-    .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px; margin:18px 0}
-    .row{display:grid; grid-template-columns:1fr 1fr; gap:14px}
-    .row > div{display:flex; flex-direction:column; gap:8px}
-    label{font-size:14px; color:#bfe6ee}
-    input[type="text"], select{width:100%; padding:12px 12px; background:#102636; border:1px solid var(--line); color:var(--text); border-radius:10px; outline:none}
-    .chips{display:flex; flex-wrap:wrap; gap:10px}
-    .chip{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line); background:#102636; padding:10px 14px; border-radius:999px; cursor:pointer; user-select:none}
-    .chip input{appearance:none; width:14px; height:14px; border-radius:50%; border:2px solid var(--muted); display:inline-block; position:relative}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif}
+    a{color:var(--accent);text-decoration:none}
+    .wrap{max-width:920px;margin:0 auto;padding:24px 16px 56px}
+    header{display:flex;align-items:center;justify-content:center;gap:10px;margin:10px 0 14px}
+    header h1{display:flex;align-items:center;gap:10px;font-size:clamp(28px,3.6vw,42px);font-weight:800;letter-spacing:-.5px;margin:0}
+    header .logo svg{width:clamp(28px,3.6vw,38px);height:auto}
+    header small{display:block;text-align:center;color:var(--muted);margin-top:6px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:18px 0}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .row>div{display:flex;flex-direction:column;gap:8px}
+    label{font-size:14px;color:#bfe6ee}
+    input[type=text],select{width:100%;padding:12px;background:#102636;border:1px solid var(--line);color:var(--text);border-radius:10px;outline:none}
+    .chips{display:flex;flex-wrap:wrap;gap:10px}
+    .chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#102636;padding:10px 14px;border-radius:999px;cursor:pointer;user-select:none}
+    .chip input{appearance:none;width:14px;height:14px;border-radius:50%;border:2px solid #9bb8c6;display:inline-block;position:relative}
     .chip input:checked{border-color:var(--accent)}
-    .chip input:checked::after{content:""; position:absolute; left:2px; top:2px; width:8px; height:8px; background:var(--accent); border-radius:50%}
-    .chip svg{width:16px; height:16px; opacity:.85}
+    .chip input:checked::after{content:"";position:absolute;left:2px;top:2px;width:8px;height:8px;background:var(--accent);border-radius:50%}
+    .chip svg{width:16px;height:16px;opacity:.85}
     .group{margin:16px 0}
-    .title{display:flex; align-items:center; justify-content:space-between}
-    .title h3{margin:6px 0 10px; font-size:16px}
-
-    .actions{display:flex; gap:12px; margin-top:10px; flex-wrap:wrap}
-    .btn{flex:1 1 220px; padding:14px 18px; border-radius:12px; border:none; font-size:16px; cursor:pointer}
-    .btn.primary{background:linear-gradient(135deg, #27caa0, #1fbf9a); color:#07241e; font-weight:700}
-    .btn.secondary{background:#e85169; color:#fff; font-weight:700}
-
-    /* Results */
+    .title{display:flex;align-items:center;justify-content:space-between}
+    .title h3{margin:6px 0 10px;font-size:16px}
+    .actions{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap}
+    .btn{flex:1 1 220px;padding:14px 18px;border-radius:12px;border:none;font-size:16px;cursor:pointer}
+    .btn.primary{background:linear-gradient(135deg,#27caa0,#1fbf9a);color:#07241e;font-weight:700}
+    .btn.secondary{background:#e85169;color:#fff;font-weight:700}
     #resultCard{display:none}
-    .scoreBox{display:flex; align-items:center; justify-content:center; text-align:center; gap:18px; padding:16px; border:1px dashed var(--line); border-radius:12px}
-    .score{font-size:40px; font-weight:900; color:#ffd76e}
-    .bad{color:var(--danger)} .ok{color:#ffd76e} .good{color:#2bd3a3}
-
-    /* ===== Ad areas ===== */
-    .ad-bar-top{margin: 8px auto 16px; max-width:970px}
-    .ad-grid-4{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:16px 0}
-    @media(min-width:700px){ .ad-grid-4{grid-template-columns:repeat(4,1fr)} }
-    .ad-row-2{display:grid; grid-template-columns:1fr; gap:12px; margin:16px 0}
-    @media(min-width:760px){ .ad-row-2{grid-template-columns:1fr 1fr} }
-    .ad-box{background:#0e2331; border:1px dashed #1f3a50; border-radius:10px; padding:2px; min-height: 90px; display:flex; align-items:center; justify-content:center; overflow:visible}
-    .ad-box ins{display:block; width:100%}
-
-    /* Side auto ads reserved rails */
-    .rails{position:fixed; top:80px; left:0; right:0; pointer-events:none}
-    .rail{position:absolute; width:160px; height:auto; min-height:600px; pointer-events:auto}
-    .rail.left{left: max(0px, (100vw - 1120px)/2 - 180px)}
-    .rail.right{right: max(0px, (100vw - 1120px)/2 - 180px)}
-    .rail .ad-box{min-height:600px}
-    @media (max-width: 1199px){ .rails{display:none} }
-
-    footer{padding:34px 0; text-align:center; color:var(--muted); font-size:13px}
+    .scoreBox{display:flex;align-items:center;justify-content:center;text-align:center;gap:18px;padding:16px;border:1px dashed var(--line);border-radius:12px}
+    .score{font-size:40px;font-weight:900;color:#ffd76e}
+    .bad{color:var(--danger)}.ok{color:#ffd76e}.good{color:#2bd3a3}
+    .ad-bar-top{margin:8px auto 16px;max-width:970px}
+    .ad-grid-4{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:16px 0}
+    @media(min-width:700px){.ad-grid-4{grid-template-columns:repeat(4,1fr)}}
+    .ad-row-2{display:grid;grid-template-columns:1fr;gap:12px;margin:16px 0}
+    @media(min-width:760px){.ad-row-2{grid-template-columns:1fr 1fr}}
+    .ad-box{background:#0e2331;border:1px dashed #1f3a50;border-radius:10px;padding:2px;min-height:90px;display:flex;align-items:center;justify-content:center;overflow:visible}
+    .ad-box ins{display:block;width:100%}
+    .rails{position:fixed;top:80px;left:0;right:0;pointer-events:none}
+    .rail{position:absolute;width:160px;min-height:600px;pointer-events:auto}
+    .rail.left{left:max(0px,(100vw - 1120px)/2 - 180px)}
+    .rail.right{right:max(0px,(100vw - 1120px)/2 - 180px)}
+    @media(max-width:1199px){.rails{display:none}}
+    footer{padding:34px 0;text-align:center;color:var(--muted);font-size:13px}
   </style>
 </head>
 <body>
-  <!-- Side rails for automatic ads (kept outside main width so they never clip) -->
   <div class="rails" aria-hidden="true">
-    <div class="rail left">
-      <div class="ad-box">
-        <!-- 사이드 자동 광고 -->
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-format="auto"
-             data-full-width-responsive="false"
-             data-ad-client="ca-pub-1819982598567420"></ins>
-      </div>
-    </div>
-    <div class="rail right">
-      <div class="ad-box">
-        <!-- 사이드 자동 광고 -->
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-format="auto"
-             data-full-width-responsive="false"
-             data-ad-client="ca-pub-1819982598567420"></ins>
-      </div>
-    </div>
+    <div class="rail left"><div class="ad-box">
+      <ins class="adsbygoogle" style="display:block" data-ad-format="auto" data-full-width-responsive="false" data-ad-client="ca-pub-1819982598567420"></ins>
+    </div></div>
+    <div class="rail right"><div class="ad-box">
+      <ins class="adsbygoogle" style="display:block" data-ad-format="auto" data-full-width-responsive="false" data-ad-client="ca-pub-1819982598567420"></ins>
+    </div></div>
   </div>
 
   <div class="wrap">
     <header>
       <span class="logo" aria-hidden="true">
-        <!-- mountain + waves icon -->
         <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M8 46 28 18l8 10 8-12 12 30H8Z" stroke="#2bd3a3" stroke-width="4" fill="none" stroke-linejoin="round"/>
           <path d="M8 54c5 0 5-4 10-4s5 4 10 4 5-4 10-4 5 4 10 4" stroke="#2bd3a3" stroke-width="3" fill="none"/>
@@ -133,26 +79,14 @@
     </header>
     <small>150년 전통 풍수 이론 + 실제 생활 데이터 기반</small>
 
-    <!-- (요청) 타이틀 아래 디스플레이/반응형 상단 고정 광고 1개 -->
     <div class="ad-bar-top">
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-1819982598567420"
-           data-ad-slot="1111111111"  <!-- TODO: 본인 슬롯 -->
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1819982598567420" data-ad-slot="1111111111" data-ad-format="auto" data-full-width-responsive="true"></ins>
     </div>
 
     <section class="card" id="formCard" aria-label="입력 폼">
       <div class="row">
-        <div>
-          <label>주소</label>
-          <input type="text" id="addr" placeholder="예) 서울 종로구 세종대로 209" inputmode="text"/>
-        </div>
-        <div>
-          <label>층수</label>
-          <input type="text" id="floor" placeholder="예) 7층" inputmode="numeric"/>
-        </div>
+        <div><label>주소</label><input type="text" id="addr" placeholder="예) 서울 종로구 세종대로 209" inputmode="text"/></div>
+        <div><label>층수</label><input type="text" id="floor" placeholder="예) 7층" inputmode="numeric"/></div>
       </div>
 
       <div class="group">
@@ -160,20 +94,12 @@
           <div>
             <label>건물 유형</label>
             <select id="type">
-              <option value="">선택하세요</option>
-              <option>아파트</option>
-              <option>오피스텔</option>
-              <option>연립/빌라</option>
-              <option>단독주택</option>
+              <option value="">선택하세요</option><option>아파트</option><option>오피스텔</option><option>연립/빌라</option><option>단독주택</option>
             </select>
           </div>
           <div>
-            <div class="title">
-              <label>거실 방향</label>
-              <a href="#!" id="dirHelp">방향 확인법</a>
-            </div>
+            <div class="title"><label>거실 방향</label><a href="#!" id="dirHelp">방향 확인법</a></div>
             <div class="chips" id="dirChips" role="radiogroup" aria-label="거실 방향">
-              <!-- 8방위 모두 제공 + 모름 -->
               <label class="chip"><input type="radio" name="dir" value="북">북</label>
               <label class="chip"><input type="radio" name="dir" value="북동">북동</label>
               <label class="chip"><input type="radio" name="dir" value="동">동</label>
@@ -259,70 +185,33 @@
         <button class="btn secondary" id="askBtn">무료 운세 보러가기</button>
       </div>
 
-      <!-- (요청) 분석 버튼 아래 디스플레이 · 수평 · 반응형 중간 광고 2개 -->
       <div class="ad-row-2">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-1819982598567420"
-             data-ad-slot="4103740429"  <!-- TODO: 슬롯 -->
-             data-ad-format="horizontal"
-             data-full-width-responsive="true"></ins>
-
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-1819982598567420"
-             data-ad-slot="4464482511"  <!-- TODO: 슬롯 -->
-             data-ad-format="horizontal"
-             data-full-width-responsive="true"></ins>
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1819982598567420" data-ad-slot="2222222222" data-ad-format="horizontal" data-full-width-responsive="true"></ins>
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1819982598567420" data-ad-slot="3333333333" data-ad-format="horizontal" data-full-width-responsive="true"></ins>
       </div>
     </section>
 
-    <!-- (선택) 섹션 사이 추가 4-up 멀티 카드 광고 영역 예시 -->
     <section class="card">
       <div class="ad-grid-4">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-1819982598567420"
-             data-ad-slot="9447953480"></ins>
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1819982598567420" data-ad-slot="4444444444" data-ad-format="autorelaxed"></ins>
       </div>
     </section>
 
-    <!-- Result -->
     <section class="card" id="resultCard" aria-live="polite">
-      <h2 class="title" style="font-size:22px; margin-top:0">결과</h2>
-      <p id="resultAddr" style="color:var(--muted); margin-top:0"></p>
+      <h2 class="title" style="font-size:22px;margin-top:0">결과</h2>
+      <p id="resultAddr" style="color:var(--muted);margin-top:0"></p>
       <div class="scoreBox">
         <div class="score" id="score">0</div>
-        <div>
-          <div id="verdict" class="ok">임시 결과</div>
-          <small id="tips" style="color:var(--muted)"></small>
-        </div>
+        <div><div id="verdict" class="ok">임시 결과</div><small id="tips" style="color:var(--muted)"></small></div>
       </div>
 
-      <!-- (요청) 결과 안쪽 광고: 디스플레이 2 + 멀티플렉스 1 -->
       <div class="ad-row-2" id="resultAdsTop">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-1819982598567420"
-             data-ad-slot="4103740429"  <!-- TODO: 슬롯 -->
-             data-ad-format="horizontal"
-             data-full-width-responsive="true"></ins>
-
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-1819982598567420"
-             data-ad-slot="4464482511"  <!-- TODO: 슬롯 -->
-             data-ad-format="horizontal"
-             data-full-width-responsive="true"></ins>
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1819982598567420" data-ad-slot="5555555555" data-ad-format="horizontal" data-full-width-responsive="true"></ins>
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1819982598567420" data-ad-slot="6666666666" data-ad-format="horizontal" data-full-width-responsive="true"></ins>
       </div>
 
       <div class="ad-box" style="margin-top:12px">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-1819982598567420"
-             data-ad-slot="9447953480"  <!-- TODO: 슬롯 (Multiplex) -->
-             data-ad-format="autorelaxed"
-             data-full-width-responsive="true"></ins>
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1819982598567420" data-ad-slot="7777777777" data-ad-format="autorelaxed" data-full-width-responsive="true"></ins>
       </div>
 
       <div class="actions" style="margin-top:16px">
@@ -335,138 +224,38 @@
   </div>
 
   <script>
-    // ---------- Kakao 주소→좌표 (JS SDK or REST) ----------
     async function geocodeAddress(addr){
       if(!addr) return null;
-
-      // 1) 지도 JS SDK 사용 (권장, JS 키만 필요)
       try{
         if (window.kakao && kakao.maps && kakao.maps.services) {
           return await new Promise((resolve) => {
             const geocoder = new kakao.maps.services.Geocoder();
             geocoder.addressSearch(addr, function(result, status){
               if (status === kakao.maps.services.Status.OK && result[0]) {
-                resolve({lat: +result[0].y, lng: +result[0].x, raw: result[0]});
+                resolve({lat:+result[0].y,lng:+result[0].x,raw:result[0]});
               } else { resolve(null); }
             });
           });
         }
       }catch(e){ console.warn('Kakao maps geocode 실패', e); }
-
-      // 2) (선택) Kakao REST — 브라우저 노출되므로 운영 비권장
-      if (KAKAO_REST_KEY) {
-        try{
-          const res = await fetch('https://dapi.kakao.com/v2/local/search/address.json?query=' + encodeURIComponent(addr), {
-            headers: { Authorization: 'KakaoAK ' + KAKAO_REST_KEY }
-          });
-          const data = await res.json();
-          if (data && data.documents && data.documents[0]) {
-            const d = data.documents[0];
-            return {lat: +d.y, lng: +d.x, raw: d};
-          }
-        }catch(e){ console.warn('Kakao REST geocode 실패', e); }
-      }
       return null;
     }
-
-    // Helper to read selected chip values
-    function getCheckedValues(selector){
-      return [...document.querySelectorAll(selector + ' input:checked')].map(el=>el.value);
-    }
-    function getRadio(name){
-      const el = document.querySelector('input[name="'+name+'"]:checked');
-      return el ? el.value : '';
-    }
-
-    function calcScore(state){
-      // 간단한 가중치 예시 – 실제 사업 로직으로 교체하세요.
-      let s = 50;
-      if(state.dir && /남|남동|남서/.test(state.dir)) s += 10;
-      if(state.dir === '모름') s -= 3;
-      if(state.sun==='5') s += 15;
-      if(state.view.includes('산')) s += 8;
-      if(state.view.includes('묘지')) s -= 15;
-      if(state.view.includes('건물')) s -= 3;
-      if(state.loc==='막다른 골목') s -= 8;
-      if(state.bal==='확장') s += 2;
-      // 주소 좌표가 확보되면(예: 강/공원 근접 등) 추가 가점·감점 가능
-      s = Math.max(0, Math.min(100, s));
-      return s;
-    }
-
-    function verdict(score){
-      if(score>=75) return {text:'이사 굿잡', cls:'good', tip:'채광·배치가 좋아요.'};
-      if(score>=55) return {text:'보통', cls:'ok', tip:'환기와 정리로 개선해 보세요.'};
-      return {text:'이사 고민', cls:'bad', tip:'소음·그늘·막힌 배치 확인 필요.'};
-    }
-
-    // 안전한 ads 렌더링: 이미 렌더된 ins는 건너뜁니다.
-    function renderAds(root=document){
-      const els = root.querySelectorAll('ins.adsbygoogle');
-      els.forEach(el=>{
-        // data-adsbygoogle-status가 없을 때만 push
-        if (!el.getAttribute('data-adsbygoogle-status')) {
-          try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) { console.warn('ads push err', e); }
-        }
-      });
-    }
-
-    document.getElementById('runBtn').addEventListener('click', async function(){
-      const state = {
-        addr: document.getElementById('addr').value.trim(),
-        floor: document.getElementById('floor').value.trim(),
-        type: document.getElementById('type').value,
-        dir: getRadio('dir'),
-        view: getCheckedValues('#viewChips'),
-        sun: getRadio('sun'),
-        loc: getRadio('loc'),
-        limits: getCheckedValues('.group:nth-of-type(4) .chips'),
-        bal: getRadio('bal'),
-      };
-
-      // Kakao 지오코딩 (있으면 사용)
-      const geo = await geocodeAddress(state.addr);
-      state.geo = geo;
-      if (geo) console.log('Geocoded:', geo);
-
-      // 결과 표시
-      const score = calcScore(state);
-      const v = verdict(score);
-      const rc = document.getElementById('resultCard');
-      document.getElementById('resultAddr').textContent =
-        (state.addr||'입력 주소') + (state.floor ? ' · ' + state.floor : '') + ' / 참고용 결과입니다.';
-      document.getElementById('score').textContent = score;
-      const ver = document.getElementById('verdict');
-      ver.textContent = v.text;
-      ver.className = v.cls;
-      document.getElementById('tips').textContent = v.tip;
-      rc.style.display = 'block';
-      rc.scrollIntoView({behavior:'smooth'});
-
-      // 결과 섹션 안쪽 광고 렌더
-      renderAds(rc);
+    function getCheckedValues(selector){return [...document.querySelectorAll(selector+' input:checked')].map(el=>el.value)}
+    function getRadio(name){const el=document.querySelector('input[name="'+name+'"]:checked');return el?el.value:''}
+    function calcScore(state){let s=50;if(state.dir&&/남|남동|남서/.test(state.dir))s+=10;if(state.dir==='모름')s-=3;if(state.sun==='5')s+=15;if(state.view.includes('산'))s+=8;if(state.view.includes('묘지'))s-=15;if(state.view.includes('건물'))s-=3;if(state.loc==='막다른 골목')s-=8;if(state.bal==='확장')s+=2;return Math.max(0,Math.min(100,s))}
+    function verdict(score){if(score>=75)return{text:'이사 굿잡',cls:'good',tip:'채광·배치가 좋아요.'};if(score>=55)return{text:'보통',cls:'ok',tip:'환기와 정리로 개선해 보세요.'};return{text:'이사 고민',cls:'bad',tip:'소음·그늘·막힌 배치 확인 필요.'}}
+    function renderAds(root=document){const els=root.querySelectorAll('ins.adsbygoogle');els.forEach(el=>{if(!el.getAttribute('data-adsbygoogle-status')){try{(adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){}}});}
+    document.getElementById('runBtn').addEventListener('click',async function(){
+      const state={addr:document.getElementById('addr').value.trim(),floor:document.getElementById('floor').value.trim(),type:document.getElementById('type').value,dir:getRadio('dir'),view:getCheckedValues('#viewChips'),sun:getRadio('sun'),loc:getRadio('loc'),bal:getRadio('bal')};
+      const geo=await geocodeAddress(state.addr);state.geo=geo;
+      const score=calcScore(state),v=verdict(score),rc=document.getElementById('resultCard');
+      document.getElementById('resultAddr').textContent=(state.addr||'입력 주소')+(state.floor?' · '+state.floor:'')+' / 참고용 결과입니다.';
+      document.getElementById('score').textContent=score;const ver=document.getElementById('verdict');ver.textContent=v.text;ver.className=v.cls;document.getElementById('tips').textContent=v.tip;
+      rc.style.display='block';rc.scrollIntoView({behavior:'smooth'});renderAds(rc);
     });
-
-    // Share (Web Share API → Clipboard fallback)
-    document.getElementById('shareBtn').addEventListener('click', async () => {
-      const text = '우리집 풍수 진단 결과를 확인해 보세요!';
-      try{
-        if(navigator.share){
-          await navigator.share({title:document.title, text, url:location.href});
-        }else{
-          await navigator.clipboard.writeText(location.href);
-          alert('링크가 복사되었습니다.');
-        }
-      }catch(e){ console.log(e) }
-    });
-
-    // Dummy CTA
-    document.getElementById('askBtn').addEventListener('click', ()=>{
-      window.open('https://www.google.com/search?q=%EC%9A%B4%EC%84%B8', '_blank');
-    });
-
-    // 초기 광고 렌더
-    window.addEventListener('DOMContentLoaded', ()=>renderAds());
+    document.getElementById('shareBtn').addEventListener('click',async()=>{const text='우리집 풍수 진단 결과를 확인해 보세요!';try{if(navigator.share){await navigator.share({title:document.title,text,url:location.href});}else{await navigator.clipboard.writeText(location.href);alert('링크가 복사되었습니다.');}}catch(e){} });
+    document.getElementById('askBtn').addEventListener('click',()=>{window.open('https://www.google.com/search?q=%EC%9A%B4%EC%84%B8','_blank')});
+    window.addEventListener('DOMContentLoaded',()=>renderAds());
   </script>
 </body>
 </html>
